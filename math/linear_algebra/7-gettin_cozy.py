@@ -13,7 +13,10 @@ def cat_matrices2D(mat1, mat2, axis=0):
 
     if not isinstance(mat1, list) or not isinstance(mat2, list):
         return None
+
     if axis == 0:
+        if len(mat1[0]) != len(mat2[0]):
+            return None
         catmat = mat1 + mat2
 
     elif axis == 1:
