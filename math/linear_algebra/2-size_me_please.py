@@ -2,12 +2,15 @@
 
 def matrix_shape(matrix):
     """
-    Returns the shape of a matrix as a tuple (rows, columns).
+    Returns the shape of a matrix as a list of dimensions.
     """
-    rows = len(matrix)
-    columns = len(matrix[0]) if isinstance(matrix[0], list) else 1
-    if isinstance(matrix[0][0], list):
-        depth = len(matrix[0][0])
-    else:
-        return [rows, columns]
-    return [rows, columns, depth]
+    shape = []
+    curr = matrix
+
+    while isinstance(curr, list):
+        shape.append(len(curr))
+        if len(curr) == 0:
+            break
+        curr = curr[0]
+
+    return shape
