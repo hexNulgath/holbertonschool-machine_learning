@@ -3,14 +3,15 @@
 performs matrix multiplication
 """
 
+
 def mat_mul(mat1, mat2):
     """
     Multiplies two matrices.
     """
     if len(mat1[0]) != len(mat2):
-        raise None
+        return None
     new_mat = []
-    for i in range (len(mat1)):
+    for i in range(len(mat1)):
         new_row = []
         for j in range(len(mat2[0])):
             new_value = 0
