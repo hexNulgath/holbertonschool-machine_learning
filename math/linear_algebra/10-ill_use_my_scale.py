@@ -8,4 +8,4 @@ def np_shape(matrix):
     """
     Function to return the shape of a matrix
     """
-    return(matrix.shape)
+    return (matrix.shape)
