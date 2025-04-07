@@ -2,13 +2,6 @@
 """
 0-add_matrices.py
 Adds two matrices element-wise.
-This function takes two matrices (which can be 1D, 2D, or 3D lists of numbers)
-and returns a new matrix that is the element-wise sum of the two matrices.
-The function supports matrices of the same dimension and shape.
-The function handles the following cases:
-- If the matrices have different dimensions, it returns None.
-- If the matrices have incompatible shapes, it returns None.
-- If the elements are not numbers, it returns None.
 """
 
 
@@ -18,7 +11,7 @@ def add_matrices(mat1, mat2):
 
     Args:
         mat1: First matrix (can be 1D, 2D, or 3D list of numbers)
-        mat2: Second matrix (must match dimension of mat1)
+        mat2: Second matrix (must match dimension and shape of mat1)
 
     Returns:
         The resulting matrix, or None if:
@@ -39,20 +32,26 @@ def add_matrices(mat1, mat2):
         return None
 
     # Recursive case for nested lists
-    try:
-        if isinstance(mat1[0], list):
-            if len(mat1[0]) != len(mat2[0]):
+    if isinstance(mat1[0], list):
+        # Check if all sublists have the same length (consistent shape)
+        if any(len(sub1) != len(mat2[0]) for
+               sub1 in mat1) or any(len(sub2) != len(mat1[0]) for
+                                    sub2 in mat2):
+            return None
+        # Recursively add sub-matrices
+        result = []
+        for sub1, sub2 in zip(mat1, mat2):
+            sub_result = add_matrices(sub1, sub2)
+            if sub_result is None:
                 return None
-            # For 2D or higher dimensions, recursively add sub-matrices
-            return [add_matrices(sub1, sub2) for sub1, sub2 in zip(mat1, mat2)]
-        else:
-            # 1D case - element-wise addition
-            if len(mat1) != len(mat2):
-                return None
-            return [a + b for a, b in zip(mat1, mat2)]
-    except TypeError:
-        # Handle case where elements aren't numbers
-        return None
-    except IndexError:
-        # Handle dimension mismatches in sub-matrices
-        return None
+            result.append(sub_result)
+        return result
+    else:
+        # 1D case - element-wise addition
+        if len(mat1) != len(mat2):
+            return None
+        # Check all elements are numbers
+        if not all(isinstance(x, (int, float)) and
+                   isinstance(y, (int, float)) for x, y in zip(mat1, mat2)):
+            return None
+        return [x + y for x, y in zip(mat1, mat2)]
