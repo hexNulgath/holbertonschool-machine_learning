@@ -6,7 +6,6 @@ This function takes a matrix and a dictionary of axes as input,
 and returns a new matrix that is sliced along the specified axes.
 The function supports slicing along the first three axes (0, 1, and 2).
 """
-import numpy as np
 
 
 def np_slice(matrix, axes=None):
@@ -34,9 +33,6 @@ def np_slice(matrix, axes=None):
     """
     if axes is None:
         axes = {}
-
-    if not isinstance(matrix, np.ndarray):
-        raise TypeError("Input must be a numpy array")
 
     slices = []
     for dim in range(matrix.ndim):
