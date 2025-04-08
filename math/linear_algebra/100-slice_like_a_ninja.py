@@ -39,10 +39,7 @@ def np_slice(matrix, axes=None):
         if dim in axes:
             dim_spec = axes[dim]
 
-            # Handle slice objects directly
-            if isinstance(dim_spec, slice):
-                slices.append(dim_spec)
-                continue
+        
 
             # Handle tuple specifications
             try:

@@ -9,12 +9,11 @@ def matrix_shape(matrix):
     Returns the shape of a matrix as a list of dimensions.
     """
     shape = []
-    curr = matrix
 
-    while isinstance(curr, list):
-        shape.append(len(curr))
-        if len(curr) == 0:
+    while isinstance(matrix, list):
+        shape.append(len(matrix))
+        if len(matrix) == 0:
             break
-        curr = curr[0]
+        matrix = matrix[0]
 
     return shape
