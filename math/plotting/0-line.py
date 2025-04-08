@@ -7,6 +7,7 @@ It generates a cubic function and plots it with a red line.
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def line():
     """
     Plot a line graph using matplotlib.
