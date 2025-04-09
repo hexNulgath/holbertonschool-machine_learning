@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
+"""
+All in one plot
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 
-def all_in_one():
 
+def all_in_one():
+    """
+    All in one plot
+    """
     y0 = np.arange(0, 11) ** 3
 
     mean = [69, 0]
@@ -40,13 +46,13 @@ def all_in_one():
     ax[0, 1].set_xlabel("Height (in)", fontsize='x-small')
     ax[0, 1].set_ylabel("Weight (lbs)", fontsize='x-small')
 
-    ax[1,0].plot(x2, y2)
-    ax[1,0].set_title("Exponential Decay of C-14", fontsize='x-small')
-    ax[1,0].set_xlabel("Time (years)", fontsize='x-small')
-    ax[1,0].set_ylabel("Fraction Remaining", fontsize='x-small')
-    ax[1,0].set_xticks(np.arange(0, 28651, 10000))
+    ax[1, 0].plot(x2, y2)
+    ax[1, 0].set_title("Exponential Decay of C-14", fontsize='x-small')
+    ax[1, 0].set_xlabel("Time (years)", fontsize='x-small')
+    ax[1, 0].set_ylabel("Fraction Remaining", fontsize='x-small')
+    ax[1, 0].set_xticks(np.arange(0, 28651, 10000))
     ax[1, 0].set_xlim(0, 28651)
-    ax[1,0].set_yscale('log')
+    ax[1, 0].set_yscale('log')
 
     ax[1, 1].plot(x3, y31, label="C-14", color="red", linestyle="--")
     ax[1, 1].plot(x3, y32, label="Ra-226", color="green", linestyle="-")
@@ -55,7 +61,8 @@ def all_in_one():
     ax[1, 1].set_yticks(np.arange(0, 1.1, 0.5))
     ax[1, 1].set_xlim(0, 20000)
     ax[1, 1].set_xticks(np.arange(0, 20001, 5000))
-    ax[1, 1].set_title("Exponential Decay of Radioactive Elements", fontsize='x-small')
+    ax[1, 1].set_title("Exponential Decay of Radioactive Elements",
+                       fontsize='x-small')
     ax[1, 1].set_xlabel("Time (years)", fontsize='x-small')
     ax[1, 1].set_ylabel("Fraction Remaining", fontsize='x-small')
 
