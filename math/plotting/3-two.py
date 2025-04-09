@@ -24,7 +24,7 @@ def two():
     plt.ylim(0, 1)
 
     plt.plot(x, y1, label="C-14", color="red", linestyle="--")
-    plt.plot(x, y2, label="Ra-266", color="green", linestyle="-")
+    plt.plot(x, y2, label="Ra-226", color="green", linestyle="-")
 
     plt.legend()
     plt.show()
