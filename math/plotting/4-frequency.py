@@ -19,12 +19,6 @@ def frequency():
     plt.xlim(0, 100)
     plt.ylim(0, 30)
     bins = np.arange(0, 101, 10)
-    histogram, _ = np.histogram(student_grades, bins=bins)
-    plt.bar(
-        bins[:-1],
-        histogram,
-        width=10,
-        edgecolor='black',
-        align='edge',
-    )
+    plt.xticks(bins)
+    plt.hist(student_grades, bins, edgecolor='black')
     plt.show()
