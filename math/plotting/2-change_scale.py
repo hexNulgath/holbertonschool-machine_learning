@@ -3,7 +3,8 @@
 Logarithmic Scale Visualization Module
 
 This module creates a line graph with a logarithmic y-axis to visualize
-the exponential decay of Carbon-14, a concept fundamental to radiocarbon dating.
+the exponential decay of Carbon-14,
+a concept fundamental to radiocarbon dating.
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,15 +12,16 @@ import matplotlib.pyplot as plt
 
 def change_scale():
     """
-    Creates and displays a line graph of exponential decay with a logarithmic y-axis.
-    
+    Creates and displays a line graph of
+    exponential decay with a logarithmic y-axis.
+
     This function plots the exponential decay of Carbon-14 over time.
     The y-axis uses a logarithmic scale to better visualize the decay pattern
     that occurs over an extended timeframe (28,650 years).
-    
+
     Args:
         None
-        
+
     Returns:
         None: Displays the plot directly
     """
