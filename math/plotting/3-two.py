@@ -19,7 +19,7 @@ def two():
     plt.figure(figsize=(6.4, 4.8))
     plt.xlabel("Time (years)")
     plt.ylabel("Fraction remaining")
-    plt.title("Radioactive decay")
+    plt.title("Exponential Decay of Radioactive Elements")
     plt.xlim(0, 20000)
     plt.ylim(0, 1)
     plt.plot(x, y1, label="C-14", color="red", linestyle="--")
