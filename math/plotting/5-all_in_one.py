@@ -42,7 +42,7 @@ def all_in_one():
     ax[0, 1].scatter(x1, y1, color="purple")
     ax[0, 1].set_yticks(np.arange(170, 191, 10))
     ax[0, 1].set_xticks(np.arange(60, 81, 10))
-    ax[0, 1].set_title("Men's Height vs Weight")
+    ax[0, 1].set_title("Men's Height vs Weight", fontsize='x-small')
     ax[0, 1].set_xlabel("Height (in)", fontsize='x-small')
     ax[0, 1].set_ylabel("Weight (lbs)", fontsize='x-small')
 
