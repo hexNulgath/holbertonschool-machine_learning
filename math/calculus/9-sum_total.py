@@ -6,11 +6,12 @@ Calculate the sum of squares of the first n natural numbers.
 
 def summation_i_squared(n):
     """
+    Computes the sum of squares from 1 to n using the mathematical formula.
     Args:
-    n (int): The upper limit of the summation.
+        n (int): Upper limit of the summation.
     Returns:
-    int: The sum of squares from 1 to n.
+        int: Sum of squares, or None if n < 1.
     """
     if n < 1:
         return None
-    return sum(i**2 for i in range(1, n + 1))
+    return n * (n + 1) * (2 * n + 1) // 6
