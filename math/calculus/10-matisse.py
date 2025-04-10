@@ -20,7 +20,7 @@ def poly_derivative(poly):
         return [0]
     if poly == []:
         return None
-    if type(poly) != list:
+    if type(poly) is not list:
         return None
     if len(poly) == 1:
         return [0]
