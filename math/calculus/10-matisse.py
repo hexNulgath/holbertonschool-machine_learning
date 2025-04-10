@@ -18,6 +18,10 @@ def poly_derivative(poly):
     """
     if poly == [0]:
         return [0]
+    if poly == []:
+        return None
+    if type(poly) != list:
+        return None
     if len(poly) == 1:
         return [0]
     if len(poly) == 2:
