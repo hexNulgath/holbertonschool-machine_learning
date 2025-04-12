@@ -20,7 +20,7 @@ def gradient():
     plt.ylabel('y coordinate (m)')
     plt.xlabel('x coordinate (m)')
     plt.title('Mountain Elevation')
-    plt.scatter(x, y, c=z)
-    plt.colorbar(label='Elevation (m)')
+    scatter = plt.scatter(x, y, c=z, cmap='viridis')
+    plt.colorbar(scatter, label='Elevation (m)')
 
     plt.show()
