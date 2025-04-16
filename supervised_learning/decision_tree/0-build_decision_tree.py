@@ -25,6 +25,7 @@ class Node:
     def max_depth_below(self):
         """
             Return the maximum depth of the tree below this node
+            This is used to calculate the depth of the tree
         """
         if self.is_leaf:
             return self.depth
@@ -44,6 +45,7 @@ class Node:
 class Leaf(Node):
     """
         Leaf node of the decision tree
+        Class to build a decision tree classifier
     """
     def __init__(self, value, depth=None):
         super().__init__()
