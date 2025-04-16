@@ -105,7 +105,7 @@ class Node:
         new_text = "    +--" + lines[0] + "\n"
         for x in lines[1:]:
             if x.strip():
-                new_text += "    |      " + x + "\n"
+                new_text+=("    |  "+x)+"\n"
         return new_text.rstrip()
 
     def right_child_add_prefix(self, text):
@@ -118,7 +118,7 @@ class Node:
         new_text = "    +--" + lines[0] + "\n"
         for x in lines[1:]:
             if x.strip():
-                new_text += "           " + x + "\n"
+                new_text+=("       "+x)+"\n"
         return new_text.rstrip()
 
     def __str__(self):
