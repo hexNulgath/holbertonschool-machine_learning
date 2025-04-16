@@ -97,7 +97,8 @@ class Node:
 
     def left_child_add_prefix(self, text):
         """
-        Formats the left child subtree with exact indentation matching desired output.
+        Formats the left child subtree with
+        exact indentation matching desired output.
         """
         if not text:
             return ""
@@ -105,12 +106,13 @@ class Node:
         new_text = "    +--" + lines[0] + "\n"
         for x in lines[1:]:
             if x.strip():
-                new_text+=("    |  "+x)+"\n"
+                new_text += ("    |  "+x)+"\n"
         return new_text
 
     def right_child_add_prefix(self, text):
         """
-        Formats the right child subtree with exact indentation matching desired output.
+        Formats the right child subtree with
+        exact indentation matching desired output.
         """
         if not text:
             return ""
@@ -118,31 +120,34 @@ class Node:
         new_text = "    +--" + lines[0] + "\n"
         for x in lines[1:]:
             if x.strip():
-                new_text+=("       "+x)+"\n"
+                new_text += ("       " + x) + "\n"
         return new_text
 
     def __str__(self):
         """
-        Generates string representation that exactly matches desired output format.
+        Generates string representation that
+        exactly matches desired output format.
         """
         if self.is_leaf:
             return f"leaf [value={self.value}]"
-        
+
         # Format node information
         if self.is_root:
-            node_info = f"root [feature={self.feature}, threshold={self.threshold}]\n"
+            node_info = f"root [feature={self.feature}, " + \
+                        f"threshold={self.threshold}]\n"
         else:
-            node_info = f"-> node [feature={self.feature}, threshold={self.threshold}]\n"
-        
+            node_info = f"-> node [feature={self.feature}, " + \
+                        f"threshold={self.threshold}]\n"
+
         # Handle children
         left_str = str(self.left_child) if self.left_child else ""
         right_str = str(self.right_child) if self.right_child else ""
-        
+
         if left_str:
             node_info += self.left_child_add_prefix(left_str)
         if right_str:
             node_info += self.right_child_add_prefix(right_str)
-        
+
         return node_info
 
 
