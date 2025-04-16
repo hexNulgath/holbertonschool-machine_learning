@@ -97,38 +97,44 @@ class Node:
 
     def left_child_add_prefix(self, text):
         """
-        Formats the left child subtree for tree visualization with proper connecting symbols.
+        Formats the left child subtree with exact indentation matching desired output.
         """
-        lines=text.split("\n")
-        new_text="    +--"+lines[0]+"\n"
-        for x in lines[1:] :
-            new_text+=("    |  "+x)+"\n"
+        if not text:
+            return ""
+        lines = text.split("\n")
+        new_text = "    +--" + lines[0] + "\n"
+        for x in lines[1:]:
+            if x.strip():
+                new_text += "    |      " + x + "\n"
         return new_text.rstrip()
 
     def right_child_add_prefix(self, text):
         """
-        Formats the right child subtree for tree visualization with proper connecting symbols.
+        Formats the right child subtree with exact indentation matching desired output.
         """
+        if not text:
+            return ""
         lines = text.split("\n")
         new_text = "    +--" + lines[0] + "\n"
         for x in lines[1:]:
-            if x.strip():  # Only process non-empty lines
-                new_text += "       " + x + "\n"
+            if x.strip():
+                new_text += "           " + x + "\n"
         return new_text.rstrip()
 
     def __str__(self):
         """
-        Generates a complete string representation of the node and its subtree.
+        Generates string representation that exactly matches desired output format.
         """
         if self.is_leaf:
             return f"leaf [value={self.value}]"
         
-        node_info = f"-> node [feature={self.feature}, threshold={self.threshold}]" \
-                    if not self.is_root else f"root [feature={self.feature}, threshold={self.threshold}]"
+        # Format node information
+        if self.is_root:
+            node_info = f"root [feature={self.feature}, threshold={self.threshold}]"
+        else:
+            node_info = f"-> node [feature={self.feature}, threshold={self.threshold}]"
         
-        if not self.left_child and not self.right_child:
-            return node_info
-        
+        # Handle children
         left_str = str(self.left_child) if self.left_child else ""
         right_str = str(self.right_child) if self.right_child else ""
         
