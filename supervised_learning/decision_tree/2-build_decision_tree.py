@@ -113,7 +113,7 @@ class Node:
         new_text = "    +--" + lines[0] + "\n"
         for x in lines[1:]:
             if x.strip():  # Only process non-empty lines
-                new_text += "           " + x + "\n"
+                new_text += "       " + x + "\n"
         return new_text.rstrip()
 
     def __str__(self):
