@@ -97,67 +97,47 @@ class Node:
 
     def left_child_add_prefix(self, text):
         """
-        Formats the left child subtree for tree
-        visualization with proper connecting symbols.
-
-        Args:
-            text (str): The string representation of the left child subtree
-
-        Returns:
-            str: Formatted text with tree connection symbols
+        Formats the left child subtree for tree visualization with proper connecting symbols.
         """
-        if not text:
-            return ""
-        lines = text.split("\n")
-        new_text = "    +--" + lines[0] + "\n"
-        for x in lines[1:]:
-            if x.strip():  # Only process non-empty lines
-                new_text += "    |  " + x + "\n"
-        return new_text.rstrip()  # Remove trailing newline
+        lines=text.split("\n")
+        new_text="    +--"+lines[0]+"\n"
+        for x in lines[1:] :
+            new_text+=("    |  "+x)+"\n"
+        return new_text.rstrip()
 
     def right_child_add_prefix(self, text):
         """
-        Formats the right child subtree for tree
-        visualization with proper connecting symbols.
-
-        Args:
-            text (str): The string representation of the right child subtree
-
-        Returns:
-            str: Formatted text with tree connection symbols
+        Formats the right child subtree for tree visualization with proper connecting symbols.
         """
-        if not text:
-            return ""
         lines = text.split("\n")
         new_text = "    +--" + lines[0] + "\n"
         for x in lines[1:]:
             if x.strip():  # Only process non-empty lines
-                new_text += "       " + x + "\n"
-        return new_text.rstrip()  # Remove trailing newline
+                new_text += "           " + x + "\n"
+        return new_text.rstrip()
 
     def __str__(self):
         """
         Generates a complete string representation of the node and its subtree.
-
-        Returns:
-            str: Formatted tree structure
         """
-        node_info = ""
-        if self.is_root:
-            node_info = f"root [feature={self.feature}]\n"
-        else:
-            node_info = f"-->node [feature={self.feature}, "
-            node_info += f"threshold={self.threshold}]\n"
-
+        if self.is_leaf:
+            return f"leaf [value={self.value}]"
+        
+        node_info = f"-> node [feature={self.feature}, threshold={self.threshold}]" \
+                    if not self.is_root else f"root [feature={self.feature}, threshold={self.threshold}]"
+        
+        if not self.left_child and not self.right_child:
+            return node_info
+        
         left_str = str(self.left_child) if self.left_child else ""
         right_str = str(self.right_child) if self.right_child else ""
-
+        
         if left_str:
-            node_info += self.left_child_add_prefix(left_str) + "\n"
+            node_info += "\n" + self.left_child_add_prefix(left_str)
         if right_str:
-            node_info += self.right_child_add_prefix(right_str) + "\n"
-
-        return node_info.rstrip()
+            node_info += "\n" + self.right_child_add_prefix(right_str)
+        
+        return node_info
 
 
 class Leaf(Node):
