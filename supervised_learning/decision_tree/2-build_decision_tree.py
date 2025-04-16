@@ -106,7 +106,7 @@ class Node:
         for x in lines[1:]:
             if x.strip():
                 new_text+=("    |  "+x)+"\n"
-        return new_text.rstrip()
+        return new_text
 
     def right_child_add_prefix(self, text):
         """
@@ -119,7 +119,7 @@ class Node:
         for x in lines[1:]:
             if x.strip():
                 new_text+=("       "+x)+"\n"
-        return new_text.rstrip()
+        return new_text
 
     def __str__(self):
         """
@@ -130,18 +130,18 @@ class Node:
         
         # Format node information
         if self.is_root:
-            node_info = f"root [feature={self.feature}, threshold={self.threshold}]"
+            node_info = f"root [feature={self.feature}, threshold={self.threshold}]\n"
         else:
-            node_info = f"-> node [feature={self.feature}, threshold={self.threshold}]"
+            node_info = f"-> node [feature={self.feature}, threshold={self.threshold}]\n"
         
         # Handle children
         left_str = str(self.left_child) if self.left_child else ""
         right_str = str(self.right_child) if self.right_child else ""
         
         if left_str:
-            node_info += "\n" + self.left_child_add_prefix(left_str)
+            node_info += self.left_child_add_prefix(left_str)
         if right_str:
-            node_info += "\n" + self.right_child_add_prefix(right_str)
+            node_info += self.right_child_add_prefix(right_str)
         
         return node_info
 
