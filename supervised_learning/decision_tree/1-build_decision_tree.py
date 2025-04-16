@@ -129,8 +129,8 @@ class Leaf(Node):
             int: Depth of this leaf node.
         """
         return self.depth
-    
-    def count_nodes_below(self, only_leaves=False) :
+
+    def count_nodes_below(self, only_leaves=False):
         """
         Count the number of nodes below this leaf node.
         Args:
@@ -193,7 +193,7 @@ class Decision_Tree():
             int: Maximum depth of the tree.
         """
         return self.root.max_depth_below()
-    
+
     def count_nodes(self, only_leaves=False):
         """
         Count the number of nodes in the tree.
