@@ -332,6 +332,15 @@ class Leaf(Node):
         pass
 
     def pred(self, x):
+        """
+        Predict the target value for the given input.
+
+        Args:
+            x (numpy.ndarray): Input feature vector for prediction.
+
+        Returns:
+            The predicted value for the input sample.
+        """
         return self.value
 # END class Leaf
 
