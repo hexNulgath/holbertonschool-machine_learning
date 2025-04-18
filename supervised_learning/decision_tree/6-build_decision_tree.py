@@ -245,6 +245,15 @@ class Node:
         )
 
     def pred(self, x):
+        """
+        Predict the class for a given input sample.
+
+        Args:
+            x (numpy.ndarray): Input feature vector for prediction.
+
+        Returns:
+            The predicted class for the input sample.
+        """
         if x[self.feature] > self.threshold:
             return self.left_child.pred(x)
         else:
@@ -413,9 +422,17 @@ class Decision_Tree():
         self.root.update_bounds_below()
 
     def pred(self, x):
+        """
+        Predict the target value for the given input
+        """
         return self.root.pred(x)
 
     def update_predict(self):
+        """
+        Update the prediction method for the decision tree.
+        This method sets the predict function to use the
+        leaf nodes' prediction methods.
+        """
         self.update_bounds()
         leaves = self.get_leaves()
         for leaf in leaves:
