@@ -208,7 +208,7 @@ class Node:
                     if x[feature] < lower_value:
                         return False
                 return True
-            
+
             # Handle multiple samples (2D array)
             result = np.ones(len(x), dtype=bool)
             for i in range(len(x)):
@@ -228,7 +228,7 @@ class Node:
                     if x[feature] > upper_value:
                         return False
                 return True
-                
+
             # Handle multiple samples (2D array)
             result = np.ones(len(x), dtype=bool)
             for i in range(len(x)):
@@ -240,7 +240,7 @@ class Node:
 
         # Create indicator function that handles both 1D and 2D arrays
         self.indicator = lambda x: (
-            is_large_enough(x) and is_small_enough(x) if x.ndim == 1 
+            is_large_enough(x) and is_small_enough(x) if x.ndim == 1
             else np.logical_and(is_large_enough(x), is_small_enough(x))
         )
 
@@ -322,9 +322,9 @@ class Leaf(Node):
         """
         pass
 
-    def pred(self, x) :
+    def pred(self, x):
         return self.value
-#END class Leaf
+# END class Leaf
 
 
 class Decision_Tree():
@@ -413,11 +413,13 @@ class Decision_Tree():
         self.root.update_bounds_below()
 
     def pred(self, x):
-            return self.root.pred(x)
+        return self.root.pred(x)
 
     def update_predict(self):
         self.update_bounds()
         leaves = self.get_leaves()
         for leaf in leaves:
-            leaf.update_indicator()          
-        self.predict = lambda A: np.array([leaf.pred(A[i]) for i in range(len(A)) for leaf in leaves if leaf.indicator(A[i])])
+            leaf.update_indicator()
+        self.predict = lambda A: np.array([
+            leaf.pred(A[i]) for i in range(len(A))
+            for leaf in leaves if leaf.indicator(A[i])])
