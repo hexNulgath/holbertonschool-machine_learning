@@ -617,7 +617,7 @@ class Decision_Tree():
             gini_left = 1 - np.sum(left_probs ** 2)
             gini_right = 1 - np.sum(right_probs ** 2)
 
-            # Weighted average of Gini impurities 
+            # Weighted average of Gini impurities
             left_weight = left_total / len(node.sub_population)
             right_weight = right_total / len(node.sub_population)
 
