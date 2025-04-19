@@ -98,9 +98,18 @@ class Isolation_Random_Tree():
         leaves = self.get_leaves()
         for leaf in leaves:
             leaf.update_indicator()
-        self.predict = lambda A: np.array([
-            leaf.pred(A[i]) for i in range(len(A))
-            for leaf in leaves if leaf.indicator(A[i])])
+        
+        # Fix: Return exactly one prediction per sample
+        def predict_func(A):
+            results = np.zeros(len(A))
+            for i in range(len(A)):
+                for leaf in leaves:
+                    if leaf.indicator(A[i]):
+                        results[i] = leaf.pred(A[i])
+                        break  # Only take first matching leaf
+            return results
+        
+        self.predict = predict_func
 
     def np_extrema(self, arr):
         """Calculate min and max of array.
@@ -144,7 +153,7 @@ class Isolation_Random_Tree():
             Leaf: New leaf node
         """
 
-        leaf_child = Leaf(np.sum(sub_population))
+        leaf_child = Leaf(node.depth)
         leaf_child.depth = node.depth + 1
         leaf_child.sub_population = sub_population
         return leaf_child
