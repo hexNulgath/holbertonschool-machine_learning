@@ -98,7 +98,7 @@ class Isolation_Random_Tree():
         leaves = self.get_leaves()
         for leaf in leaves:
             leaf.update_indicator()
-        
+
         # Fix: Return exactly one prediction per sample
         def predict_func(A):
             results = np.zeros(len(A))
@@ -108,7 +108,7 @@ class Isolation_Random_Tree():
                         results[i] = leaf.pred(A[i])
                         break  # Only take first matching leaf
             return results
-        
+
         self.predict = predict_func
 
     def np_extrema(self, arr):
