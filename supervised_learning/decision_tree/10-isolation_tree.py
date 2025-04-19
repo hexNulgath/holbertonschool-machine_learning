@@ -153,7 +153,7 @@ class Isolation_Random_Tree():
             Leaf: New leaf node
         """
 
-        leaf_child = Leaf(node.depth)
+        leaf_child = Leaf(node.depth + 1)
         leaf_child.depth = node.depth + 1
         leaf_child.sub_population = sub_population
         return leaf_child
