@@ -96,11 +96,11 @@ class Isolation_Random_Tree():
         """Update prediction function."""
         self.update_bounds()
         leaves = self.get_leaves()
-
-        def predict_func(A):
-            return np.array([self.path_length(x) for x in A])
-
-        self.predict = predict_func
+        for leaf in leaves:
+            leaf.update_indicator()
+        self.predict = lambda A: np.array([
+            leaf.pred(A[i]) for i in range(len(A))
+            for leaf in leaves if leaf.indicator(A[i])])
 
     def np_extrema(self, arr):
         """Calculate min and max of array.
@@ -126,8 +126,8 @@ class Isolation_Random_Tree():
         while diff == 0:
             feature = self.rng.integers(0, self.explanatory.shape[1])
             feature_min, feature_max = self.np_extrema(
-                self.explanatory[node.sub_population, feature]
-            )
+                self.explanatory[:, feature][node.sub_population]
+                )
             diff = feature_max - feature_min
         x = self.rng.uniform()
         threshold = (1 - x) * feature_min + x * feature_max
@@ -143,12 +143,10 @@ class Isolation_Random_Tree():
         Returns:
             Leaf: New leaf node
         """
-        feature_values = self.explanatory[node.sub_population, node.feature]
 
-        leaf_child = Leaf(feature_values)
+        leaf_child = Leaf(np.sum(sub_population))
         leaf_child.depth = node.depth + 1
         leaf_child.sub_population = sub_population
-        leaf_child.size = np.sum(sub_population)
         return leaf_child
 
     def get_node_child(self, node, sub_population):
@@ -165,27 +163,6 @@ class Isolation_Random_Tree():
         n.depth = node.depth + 1
         n.sub_population = sub_population
         return n
-
-    def path_length(self, x, node=None):
-        """Calculate path length for a sample.
-
-        Args:
-            x (np.ndarray): Sample
-            node (Node): Current node (default root)
-
-        Returns:
-            float: Path length
-        """
-        if node is None:
-            node = self.root
-        if isinstance(node, Leaf):
-            if node.size <= 1:
-                return float(node.depth)
-            return float(
-                node.depth + 2 * (np.log(node.size - 1) + 0.5772156649))
-        if x[node.feature] > node.threshold:
-            return self.path_length(x, node.left_child)
-        return self.path_length(x, node.right_child)
 
     def fit_node(self, node):
         """Recursively fit tree starting from node.
