@@ -143,7 +143,9 @@ class Isolation_Random_Tree():
         Returns:
             Leaf: New leaf node
         """
-        leaf_child = Leaf(sub_population)
+        feature_values = self.explanatory[node.sub_population, node.feature]
+
+        leaf_child = Leaf(feature_values)
         leaf_child.depth = node.depth + 1
         leaf_child.sub_population = sub_population
         leaf_child.size = np.sum(sub_population)
