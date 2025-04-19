@@ -274,7 +274,7 @@ class Leaf(Node):
         max_depth_below(): Returns the depth of this leaf node.
     """
 
-    def __init__(self, value=None, depth=None):
+    def __init__(self, value, depth=None):
         """
         Initialize a Leaf instance.
 
