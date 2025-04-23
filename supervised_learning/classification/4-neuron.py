@@ -100,3 +100,23 @@ class Neuron():
         total_cost = np.sum(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A))
         cost = - (1 / m) * total_cost
         return cost
+
+    def evaluate(self, X, Y):
+        """
+        Evaluates the neuron’s predictions
+        Args:
+            X (np.ndarray): shape (nx, m)
+                nx: number of input features to the neuron
+                m: number of examples
+            Y (np.ndarray): shape (1, m) contains the correct labels
+                            for the input data
+        Returns:
+            np.ndarray: the neuron’s prediction labels for
+                        each example in X
+            labelled 1 if the output of the neuron is >= 0.5
+            float: total cost of the network
+        """
+        A = self.forward_prop(X)
+        cost = self.cost(Y, A)
+        prediction = np.where(A >= 0.5, 1, 0)
+        return prediction, cost
