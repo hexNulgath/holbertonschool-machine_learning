@@ -120,3 +120,27 @@ class Neuron():
         cost = self.cost(Y, A)
         prediction = np.where(A >= 0.5, 1, 0)
         return prediction, cost
+
+    def gradient_descent(self, X, Y, A, alpha=0.05):
+        """
+        Calculates one pass of gradient descent on the neuron
+        Args:
+            X (np.ndarray): shape (nx, m)
+                nx: number of input features to the neuron
+                m: number of examples
+            Y (np.ndarray): shape (1, m) contains the correct labels
+                            for the input data
+            A (np.ndarray): shape (1, m) contains the activated
+                            output of the neuron for each example
+            alpha (float): learning rate
+        """
+        m = Y.shape[1]
+        # gradient of the cost with respect to A
+        dz = A - Y
+        # gradient of the cost with respect to W
+        dw = np.squeeze((1 / m) * np.dot(X, dz.T))
+        # gradient of the cost with respect to b
+        db = np.squeeze((1 / m) * np.sum(dz))
+        # update the weights and bias
+        self.__W -= alpha * dw
+        self.__b -= alpha * db
