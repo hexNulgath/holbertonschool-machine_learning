@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-import numpy as np
-"""0-neuron.py
+"""
+0-neuron.py
 Defines a class Neuron that defines a single
 neuron performing binary classification
 """
+import numpy as np
 
 
 class Neuron():
