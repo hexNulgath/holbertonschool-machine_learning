@@ -128,7 +128,7 @@ class DeepNeuralNetwork():
         for i in range(self.L, 0, -1):
             A_prev = cache['A' + str(i - 1)]
             W = self.weights['W' + str(i)]
-            # calculate the gradients for weights and biases
+            # calculate the gradients to weights and biases
             dW = np.dot(dZ, A_prev.T) / m
             db = np.sum(dZ, axis=1, keepdims=True) / m
             dZ = np.dot(W.T, dZ) * (A_prev * (1 - A_prev))
