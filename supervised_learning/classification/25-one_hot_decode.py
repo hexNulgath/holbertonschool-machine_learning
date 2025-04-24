@@ -11,6 +11,8 @@ def one_hot_decode(one_hot):
         classes: maximum number of clases
         m: number of examples
     """
+    if type(one_hot) is not np.ndarray:
+        return None
     try:
         # use argmax to get index of class
         vector = np.array(np.argmax(one_hot, axis=0))
