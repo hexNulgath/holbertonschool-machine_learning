@@ -18,5 +18,5 @@ def one_hot_encode(Y, classes):
         one_hot = np.zeros((classes, m))
         one_hot[Y, np.arange(m)] = 1
         return one_hot
-    except AttributeError or TypeError:
+    except Exception:
         return None
