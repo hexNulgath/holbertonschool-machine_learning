@@ -76,7 +76,7 @@ class DeepNeuralNetwork():
             # get current layer weights and biases
             W = self.weights['W' + str(i + 1)]
             b = self.weights['b' + str(i + 1)]
-            # get input for the neurons
+            # get input to the neurons
             A_prev = self.cache['A' + str(i)]
             # calculate the activation of the neurons
             Z = np.dot(W, A_prev) + b
