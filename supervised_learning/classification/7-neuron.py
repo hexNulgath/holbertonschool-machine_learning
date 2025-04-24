@@ -195,6 +195,8 @@ class Neuron():
         if graph:
             cost_by_step.append(cost)
             self.plot_training(cost_by_step, step)
+        if verbose:
+            print("Cost after {} iterations: {}".format(iterations, cost))
         prediction = np.where(A >= 0.5, 1, 0)
         return prediction, cost
 
