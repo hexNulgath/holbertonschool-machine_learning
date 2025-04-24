@@ -88,6 +88,17 @@ class NeuralNetwork:
         """
         return self.__A2
 
+    @staticmethod
+    def sigmoid(z):
+        """
+        Sigmoid activation function
+        Args:
+            z (np.ndarray): input to the activation function
+        Returns:
+            np.ndarray: activated output
+        """
+        return 1 / (1 + np.exp(-z))
+
     def forward_prop(self, X):
         """
         Calculates the forward propagation of the neural network
@@ -97,7 +108,7 @@ class NeuralNetwork:
         :return: A1, A2
         """
         z = np.dot(self.W1, X) + self.b1
-        self.__A1 = 1 / (1 + np.exp(-z))
+        self.__A1 = self.sigmoid(z)
         z = np.dot(self.W2, self.A1) + self.b2
-        self.__A2 = 1 / (1 + np.exp(-z))
+        self.__A2 = self.sigmoid(z)
         return self.A1, self.A2
