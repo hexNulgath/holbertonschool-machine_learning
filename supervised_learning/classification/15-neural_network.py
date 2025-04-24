@@ -156,10 +156,10 @@ class NeuralNetwork:
         """
         m = Y.shape[1]
         dz2 = A2 - Y
-        dw2 = np.dot(dz2, A1.T) / m
+        dw2 = np.matmul(dz2, A1.T) / m
         db2 = np.sum(dz2, axis=1, keepdims=True) / m
-        dz1 = np.dot(self.W2.T, dz2) * (A1 * (1 - A1))
-        dw1 = np.dot(dz1, X.T) / m
+        dz1 = np.matmul(self.W2.T, dz2) * (A1 * (1 - A1))
+        dw1 = np.matmul(dz1, X.T) / m
         db1 = np.sum(dz1, axis=1, keepdims=True) / m
         # Update weight and bias
         self.__W2 -= alpha * dw2
@@ -191,18 +191,26 @@ class NeuralNetwork:
             raise TypeError("alpha must be a float")
         if alpha < 0:
             raise ValueError("alpha must be positive")
+        if verbose or graph:
+            if not isinstance(step, int):
+                raise TypeError("step must be an integer")
+            if step <= 0 or step > iterations:
+                raise ValueError("step must be positive and <= iterations")
         if graph:
             cumulative_cost = []
         for i in range(iterations + 1):
             self.forward_prop(X)
             if verbose and i % step == 0:
-                if graph:
-                    cumulative_cost.append(self.cost(Y, self.A2))
                 cost = self.cost(Y, self.A2)
+                if graph:
+                    cumulative_cost.append(cost)
                 print(f"Cost after {i} iterations: {cost}")
             self.gradient_descent(X, Y, self.A1, self.A2, alpha)
         if graph:
             self.graph_cost(cumulative_cost, step)
+        if verbose and i % step != 0:
+            cost = self.cost(Y, self.A2)
+            print(f"Cost after {i} iterations: {cost}")
         return self.evaluate(X, Y)
 
     @staticmethod
@@ -215,6 +223,6 @@ class NeuralNetwork:
         import matplotlib.pyplot as plt
         plt.plot(np.arange(0, len(cost) * step, step), cost)
         plt.title("Training Cost")
-        plt.xlabel("Iterations")
-        plt.ylabel("Cost")
+        plt.xlabel("iteration")
+        plt.ylabel("cost")
         plt.show()
