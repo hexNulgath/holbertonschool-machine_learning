@@ -13,8 +13,10 @@ def one_hot_encode(Y, classes):
     Returns: a one-hot encoded numpy array of shape (classes, m)
     """
     import numpy as np
-
-    m = Y.shape[0]
-    one_hot = np.zeros((classes, m))
-    one_hot[Y, np.arange(m)] = 1
-    return one_hot
+    try:
+        m = Y.shape[0]
+        one_hot = np.zeros((classes, m))
+        one_hot[Y, np.arange(m)] = 1
+        return one_hot
+    except AttributeError:
+        return None
