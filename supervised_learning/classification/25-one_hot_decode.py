@@ -15,7 +15,7 @@ def one_hot_decode(one_hot):
         return None
     try:
         # use argmax to get index of class
-        vector = np.array(np.argmax(one_hot, axis=0))
+        vector = np.squeeze(np.argmax(one_hot, axis=0))
         return vector
     except Exception:
         return None
