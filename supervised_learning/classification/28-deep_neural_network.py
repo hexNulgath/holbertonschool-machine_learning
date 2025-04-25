@@ -24,9 +24,9 @@ class DeepNeuralNetwork():
         if activation not in ['sig', 'tanh']:
             raise ValueError("activation must be 'sig' or 'tanh'")
         self.__L = len(layers)
-        self.__activation = activation
         self.__cache = {}
         self.__weights = {}
+        self.__activation = activation
         for i in range(self.L):
             if type(layers[i]) is not int or layers[i] <= 0:
                 raise TypeError("layers must be a list of positive integers")
@@ -38,6 +38,13 @@ class DeepNeuralNetwork():
                 self.weights['W' + str(i + 1)] = np.random.randn(
                     layers[i], layers[i - 1]) * np.sqrt(1 / layers[i - 1])
             self.weights['b' + str(i + 1)] = np.zeros((layers[i], 1))
+
+    @property
+    def activation(self):
+        """
+        getter for activation
+        """
+        return self.__activation
 
     @property
     def L(self):
@@ -60,26 +67,20 @@ class DeepNeuralNetwork():
         """
         return self.__weights
 
-    @property
-    def activation(self):
+    @staticmethod
+    def apply_activation(z, activation):
         """
-        getter for activation
+        calculates the activation function
         """
-        return self.__activation
-
-    def apply_activation(self, z, formula='default'):
-        """
-        calculates the sigmoid activation function
-        """
-        if formula == 'default':
-            formula = self.__activation
-        if formula == 'sig':
+        if activation == 'sig':
             return 1 / (1 + np.exp(-z))
-        elif formula == 'tanh':
+        elif activation == 'tanh':
             return np.tanh(z)
-        elif formula == 'softmax':
+        elif activation == 'softmax':
             e_z = np.exp(z - np.max(z, axis=0, keepdims=True))
             return e_z / np.sum(e_z, axis=0, keepdims=True)
+        print("Unsupported activation function.")
+        return None
 
     def forward_prop(self, X):
         """
@@ -90,15 +91,24 @@ class DeepNeuralNetwork():
         """
         self.__cache = {'A0': X}
 
-        for i in range(1, self.L + 1):
+        for i in range(1, self.L):
+            # get current layer weights and biases
             W = self.weights['W' + str(i)]
             b = self.weights['b' + str(i)]
+            # get input to the neurons
             A_prev = self.cache['A' + str(i - 1)]
+            # calculate the activation of the neurons
             Z = np.dot(W, A_prev) + b
-            A = self.apply_activation(Z)
+            # apply the activation function
+            A = self.apply_activation(Z, self.activation)
             self.__cache['A' + str(i)] = A
-
-        return A, self.cache
+        W_last = self.weights['W' + str(self.L)]
+        b_last = self.weights['b' + str(self.L)]
+        A_prev = self.__cache['A' + str(self.L - 1)]
+        Z = np.dot(W_last, A_prev) + b_last
+        A = self.apply_activation(Z, 'softmax')
+        self.__cache['A' + str(self.L)] = A
+        return A, self.__cache
 
     def cost(self, Y, A):
         """
@@ -110,7 +120,7 @@ class DeepNeuralNetwork():
         """
         # Calculate binary cross-entropy loss for each class and sum
         m = Y.shape[1]
-        cost = -np.sum(Y * np.log(A + 1e-10)) / m  # Added epsilon to prevent log(0)
+        cost = -np.sum(Y * np.log(A)) / m
         return cost
 
     def evaluate(self, X, Y):
@@ -130,37 +140,75 @@ class DeepNeuralNetwork():
 
     def gradient_descent(self, Y, cache, alpha=0.05):
         """
-        Performs gradient descent with proper activation handling
-        
-        Args:
-            Y: True labels (shape: (output_units, m))
-            cache: Dictionary containing network activations
-            alpha: Learning rate
+        Calculates one pass of gradient descent on the neural network
+        Y: numpy.ndarray with shape (classes, m) containing the correct labels
+        cache: dictionary containing all the intermediary values of the network
+        alpha: learning rate
         """
         m = Y.shape[1]
-        A = cache['A' + str(self.L)]
-        dZ = A - Y  # Initial error gradient
         
-        for i in range(self.L, 0, -1):
-            A_prev = cache['A' + str(i - 1)]
-            W = self.weights['W' + str(i)]
+        # Start with the output layer
+        A_L = cache['A' + str(self.L)]
+        A_prev = cache['A' + str(self.L - 1)]
+        
+        # For output layer, error calculation depends on the activation function
+        # For binary classification with sigmoid, dZ = A - Y
+        # For softmax with cross-entropy, dZ = A - Y (same formula, different meaning)
+        dZ_L = A_L - Y
+        
+        # Calculate gradient for output layer
+        dW_L = np.dot(dZ_L, A_prev.T) / m
+        db_L = np.sum(dZ_L, axis=1, keepdims=True) / m
+        
+        # Update output layer weights
+        self.__weights['W' + str(self.L)] -= alpha * dW_L
+        self.__weights['b' + str(self.L)] -= alpha * db_L
+        
+        # Backpropagate through hidden layers
+        dZ = dZ_L
+        for i in range(self.L - 1, 0, -1):
+            # Current layer weights
+            W_current = self.__weights['W' + str(i + 1)]
+            
+            # Previous layer activation
+            if i > 1:
+                A_prev = cache['A' + str(i - 1)]
+            else:
+                A_prev = cache['A0']  # Input layer
+            
+            # Current layer activation
+            A_current = cache['A' + str(i)]
+            
+            # Backpropagate error
+            dZ = np.dot(W_current.T, dZ)
+            
+            # Apply derivative of activation function
+            if self.__activation == 'sig':
+                dZ = dZ * (A_current * (1 - A_current))
+            elif self.__activation == 'tanh':
+                dZ = dZ * (1 - np.square(A_current))
             
             # Calculate gradients
             dW = np.dot(dZ, A_prev.T) / m
             db = np.sum(dZ, axis=1, keepdims=True) / m
             
-            # Update weights and biases
-            self.weights['W' + str(i)] -= alpha * dW
-            self.weights['b' + str(i)] -= alpha * db
-            
-            # Backpropagate error to previous layer (skip for input layer)
-            if i > 1:
-                activation_type = self.__activation               
-                # Apply appropriate derivative
-                if activation_type == 'sig':
-                    dZ = np.dot(W.T, dZ) * (A_prev * (1 - A_prev))
-                elif activation_type == 'tanh':
-                    dZ = np.dot(W.T, dZ) * (1 - np.square(A_prev))
+            # Update weights
+            self.__weights['W' + str(i)] -= alpha * dW
+            self.__weights['b' + str(i)] -= alpha * db
+
+    @staticmethod
+    def sigmoid_derivative(z):
+        """
+        calculates the derivative of the sigmoid function
+        """
+        return (z * (1 - z))
+
+    @staticmethod
+    def tanh_derivative(z):
+        """
+        calculates the derivative of the tanh function
+        """
+        return (1 - np.square(z))
 
     @staticmethod
     def plot_graph(cost, step):
@@ -178,7 +226,7 @@ class DeepNeuralNetwork():
         plt.title('Training Cost')
         plt.show()
 
-    def train(self, X, Y, iterations=5000, alpha=0.05, verbose=True,
+    def train(self, X, Y, iterations=5000, alpha=0.01, verbose=True,
               graph=True, step=100):
         """
         trains the deep neural network
