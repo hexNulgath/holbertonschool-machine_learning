@@ -120,7 +120,7 @@ class DeepNeuralNetwork():
         A, _ = self.forward_prop(X)
         cost = self.cost(Y, A)
         prediction = np.argmax(A, axis=0).reshape(1, -1)
-        prediction = np.where(prediction == 1, 1, 0)
+        prediction = np.where(prediction > 1, 1, 0)
         prediction = prediction.flatten()
         return prediction, cost
 
