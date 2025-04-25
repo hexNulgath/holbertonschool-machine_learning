@@ -217,5 +217,8 @@ class DeepNeuralNetwork():
         filename is the file to load the instance from
         """
         import pickle
-        with open(filename, '+rb') as f:
-            return pickle.load(f)
+        try:
+            with open(filename, '+rb') as f:
+                return pickle.load(f)
+        except Exception:
+            return None
