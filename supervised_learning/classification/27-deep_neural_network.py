@@ -106,7 +106,6 @@ class DeepNeuralNetwork():
         """
         # Calculate binary cross-entropy loss for each class and sum
         m = Y.shape[1]
-        
         cost = -np.sum(Y * np.log(A)) / m
         return cost
 
@@ -122,6 +121,7 @@ class DeepNeuralNetwork():
         cost = self.cost(Y, A)
         prediction = np.argmax(A, axis=0).reshape(1, -1)
         prediction = np.where(prediction == 1, 1, 0)
+        prediction = prediction.flatten()
         return prediction, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
