@@ -33,10 +33,10 @@ class DeepNeuralNetwork():
             #   if first layer use inputs else use node in hidden layer
             if i == 0:
                 self.weights['W' + str(i + 1)] = np.random.randn(
-                    layers[i], nx) * np.sqrt(2 / nx)
+                    layers[i], nx) * np.sqrt(1 / nx)
             else:
                 self.weights['W' + str(i + 1)] = np.random.randn(
-                    layers[i], layers[i - 1]) * np.sqrt(2 / layers[i - 1])
+                    layers[i], layers[i - 1]) * np.sqrt(1 / layers[i - 1])
             self.weights['b' + str(i + 1)] = np.zeros((layers[i], 1))
 
     @property
@@ -67,7 +67,7 @@ class DeepNeuralNetwork():
         """
         return self.__activation
 
-    def activation(self, z, formula='default'):
+    def apply_activation(self, z, formula='default'):
         """
         calculates the sigmoid activation function
         """
@@ -91,20 +91,14 @@ class DeepNeuralNetwork():
         self.__cache = {'A0': X}
 
         for i in range(1, self.L + 1):
-            # get current layer weights and biases
             W = self.weights['W' + str(i)]
             b = self.weights['b' + str(i)]
-            # get input to the neurons
             A_prev = self.cache['A' + str(i - 1)]
-            # calculate the activation of the neurons
             Z = np.dot(W, A_prev) + b
-            # apply the activation function
-            A = self.activation(Z)
+            A = self.apply_activation(Z)
             self.__cache['A' + str(i)] = A
-        Z_out = np.dot(self.weights['W' + str(self.L)], A_prev) + self.weights['b' + str(self.L)]
-        A_out = self.activation(Z_out)
-        self.__cache['A' + str(self.L)] = A_out
-        return A_out, self.cache
+
+        return A, self.cache
 
     def cost(self, Y, A):
         """
