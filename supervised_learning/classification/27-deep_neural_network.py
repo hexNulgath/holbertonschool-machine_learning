@@ -88,14 +88,12 @@ class DeepNeuralNetwork():
             # apply the activation function
             A = self.activation(Z)
             self.__cache['A' + str(i)] = A
-            self.__cache['Z' + str(i)] = Z
         W_last = self.weights['W' + str(self.L)]
         b_last = self.weights['b' + str(self.L)]
         A_prev = self.cache['A' + str(self.L - 1)]
         Z = np.dot(W_last, A_prev) + b_last
         A = self.activation(Z, 'softmax')
         self.__cache['A' + str(self.L)] = A
-        self.__cache['Z' + str(self.L)] = Z
         return A, self.cache
 
     def cost(self, Y, A):
@@ -109,7 +107,7 @@ class DeepNeuralNetwork():
         # Calculate binary cross-entropy loss for each class and sum
         m = Y.shape[1]
         
-        cost = -np.sum(Y * np.log(A + 1e-10)) / m
+        cost = -np.sum(Y * np.log(A)) / m
         return cost
 
     def evaluate(self, X, Y):
