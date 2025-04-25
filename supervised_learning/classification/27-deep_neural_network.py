@@ -92,7 +92,7 @@ class DeepNeuralNetwork():
         b_last = self.weights['b' + str(self.L)]
         A_prev = self.__cache['A' + str(self.L - 1)]
         Z = np.dot(W_last, A_prev) + b_last
-        A = self.activation(Z)
+        A = self.activation(Z, 'softmax')
         self.__cache['A' + str(self.L)] = A
         return A, self.__cache
 
