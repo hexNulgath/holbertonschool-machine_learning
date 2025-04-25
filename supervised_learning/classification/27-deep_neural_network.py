@@ -90,11 +90,11 @@ class DeepNeuralNetwork():
             self.__cache['A' + str(i)] = A
         W_last = self.weights['W' + str(self.L)]
         b_last = self.weights['b' + str(self.L)]
-        A_prev = self.cache['A' + str(self.L - 1)]
+        A_prev = self.__cache['A' + str(self.L - 1)]
         Z = np.dot(W_last, A_prev) + b_last
-        A = self.activation(Z, 'softmax')
+        A = self.activation(Z)
         self.__cache['A' + str(self.L)] = A
-        return A, self.cache
+        return A, self.__cache
 
     def cost(self, Y, A):
         """
@@ -119,10 +119,10 @@ class DeepNeuralNetwork():
         """
         A, _ = self.forward_prop(X)
         cost = self.cost(Y, A)
-        prediction = np.argmax(A, axis=0).reshape(1, -1)
-        prediction = np.where(prediction > 1, 1, 0)
-        prediction = prediction.flatten()
-        return prediction, cost
+        prediction = np.argmax(A, axis=0)
+        one_hot_prediction = np.zeros_like(A)
+        one_hot_prediction[prediction, np.arange(A.shape[1])] = 1
+        return one_hot_prediction, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
         """
