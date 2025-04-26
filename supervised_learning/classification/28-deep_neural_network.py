@@ -153,7 +153,7 @@ class DeepNeuralNetwork():
             
             # Backpropagate error
             if i > 1:  # Skip input layer
-                if self.activation == 'sigmoid':
+                if self.activation == 'sig':  # Changed from 'sigmoid' to 'sig'
                     dZ = np.dot(W.T, dZ) * self.sigmoid_derivative(A_prev)
                 elif self.activation == 'tanh':
                     dZ = np.dot(W.T, dZ) * self.tanh_derivative(A_prev)
