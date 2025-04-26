@@ -121,7 +121,7 @@ class DeepNeuralNetwork():
         # Calculate binary cross-entropy loss for each class and sum
         m = Y.shape[1]
         cost = -np.sum(Y * np.log(A)) / m
-        return cost
+        return np.squeeze(cost)
 
     def evaluate(self, X, Y):
         """
@@ -133,7 +133,7 @@ class DeepNeuralNetwork():
         """
         A, _ = self.forward_prop(X)
         cost = self.cost(Y, A)
-        prediction = np.argmax(A, axis=0)
+        prediction = (A >= 0.5).astype(int)
         one_hot_prediction = np.zeros_like(A)
         one_hot_prediction[prediction, np.arange(A.shape[1])] = 1
         return one_hot_prediction, cost
@@ -141,30 +141,31 @@ class DeepNeuralNetwork():
     def gradient_descent(self, Y, cache, alpha=0.05):
         """
         Perform one iteration of gradient descent (backpropagation) for the neural network.
-        
+
         Args:
             Y (numpy.ndarray): True labels, shape (1, m)
             cache (dict): Dictionary containing activations ('A0', 'A1', ..., 'AL')
             alpha (float): Learning rate
-        
+
         Updates:
             self.weights: Modifies weights and biases in-place
         """
-        m = Y.shape[1]  # Number of examples
-        AL = cache['A' + str(self.L)]  # Output layer activation
-        
-        # Initialize backpropagation
-        dZ = AL - Y  # Error at output layer
-        
-        for l in range(self.L, 0, -1):  # Loop backward through layers
-            A_prev = cache['A' + str(l-1)]
+        m = Y.shape[1]
+        dZ = cache['A' + str(self.L)] - Y  # Output layer error
+
+        for l in range(self.L, 0, -1):
+            A_prev = cache['A' + str(l - 1)]
             W = self.weights['W' + str(l)]
-            
+
             # Compute gradients
             dW = np.dot(dZ, A_prev.T) / m
             db = np.sum(dZ, axis=1, keepdims=True) / m
-            
-            # Backpropagate error (skip for input layer)
+
+            # Update parameters
+            self.weights['W' + str(l)] -= alpha * dW
+            self.weights['b' + str(l)] -= alpha * db
+
+            # Backpropagate the error if not at the first layer
             if l > 1:
                 if self.activation == 'sig':
                     dZ = np.dot(W.T, dZ) * self.sigmoid_derivative(A_prev)
@@ -172,24 +173,20 @@ class DeepNeuralNetwork():
                     dZ = np.dot(W.T, dZ) * self.tanh_derivative(A_prev)
                 else:
                     raise ValueError(f"Unsupported activation: {self.activation}")
-            
-            # Update parameters
-            self.weights['W' + str(l)] -= alpha * dW
-            self.weights['b' + str(l)] -= alpha * db
 
     @staticmethod
-    def sigmoid_derivative(z):
+    def sigmoid_derivative(a):
         """
         calculates the derivative of the sigmoid function
         """
-        return (z * (1 - z))
+        return (a * (1 - a))
 
     @staticmethod
-    def tanh_derivative(z):
+    def tanh_derivative(a):
         """
         calculates the derivative of the tanh function
         """
-        return (1 - np.square(z))
+        return (1 - np.square(a))
 
     @staticmethod
     def plot_graph(cost, step):
@@ -274,7 +271,7 @@ class DeepNeuralNetwork():
         """
         import pickle
         try:
-            with open(filename, '+rb') as f:
+            with open(filename, 'rb') as f:
                 return pickle.load(f)
         except Exception:
             return None
