@@ -139,28 +139,43 @@ class DeepNeuralNetwork():
         return one_hot_prediction, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
-        m = Y.shape[1]
-        A = cache['A' + str(self.L)]
-        dZ = A - Y  # Derivative of binary cross-entropy loss w.r.t. A
-
-        for i in range(self.L, 0, -1):
-            A_prev = cache['A' + str(i - 1)]
-            W = self.weights['W' + str(i)]
+        """
+        Perform one iteration of gradient descent (backpropagation) for the neural network.
+        
+        Args:
+            Y (numpy.ndarray): True labels, shape (1, m)
+            cache (dict): Dictionary containing activations ('A0', 'A1', ..., 'AL')
+            alpha (float): Learning rate
+        
+        Updates:
+            self.weights: Modifies weights and biases in-place
+        """
+        m = Y.shape[1]  # Number of examples
+        AL = cache['A' + str(self.L)]  # Output layer activation
+        
+        # Initialize backpropagation
+        dZ = AL - Y  # Error at output layer
+        
+        for l in range(self.L, 0, -1):  # Loop backward through layers
+            A_prev = cache['A' + str(l-1)]
+            W = self.weights['W' + str(l)]
             
             # Compute gradients
             dW = np.dot(dZ, A_prev.T) / m
             db = np.sum(dZ, axis=1, keepdims=True) / m
             
-            # Backpropagate error
-            if i > 1:  # Skip input layer
-                if self.activation == 'sig':  # Changed from 'sigmoid' to 'sig'
+            # Backpropagate error (skip for input layer)
+            if l > 1:
+                if self.activation == 'sig':
                     dZ = np.dot(W.T, dZ) * self.sigmoid_derivative(A_prev)
                 elif self.activation == 'tanh':
                     dZ = np.dot(W.T, dZ) * self.tanh_derivative(A_prev)
+                else:
+                    raise ValueError(f"Unsupported activation: {self.activation}")
             
-            # Update weights
-            self.weights['W' + str(i)] -= alpha * dW
-            self.weights['b' + str(i)] -= alpha * db
+            # Update parameters
+            self.weights['W' + str(l)] -= alpha * dW
+            self.weights['b' + str(l)] -= alpha * db
 
     @staticmethod
     def sigmoid_derivative(z):
