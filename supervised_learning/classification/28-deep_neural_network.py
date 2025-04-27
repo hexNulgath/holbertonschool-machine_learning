@@ -21,8 +21,6 @@ class DeepNeuralNetwork():
             raise ValueError("nx must be a positive integer")
         if type(layers) is not list or layers == []:
             raise TypeError("layers must be a list of positive integers")
-        if activation not in ['sig', 'tanh']:
-            raise ValueError("activation must be 'sig' or 'tanh'")
         self.__L = len(layers)
         self.__cache = {}
         self.__weights = {}
@@ -33,10 +31,10 @@ class DeepNeuralNetwork():
             #   if first layer use inputs else use node in hidden layer
             if i == 0:
                 self.weights['W' + str(i + 1)] = np.random.randn(
-                    layers[i], nx) * np.sqrt(1 / nx)
+                    layers[i], nx) * np.sqrt(2 / nx)
             else:
                 self.weights['W' + str(i + 1)] = np.random.randn(
-                    layers[i], layers[i - 1]) * np.sqrt(1 / layers[i - 1])
+                    layers[i], layers[i - 1]) * np.sqrt(2 / layers[i - 1])
             self.weights['b' + str(i + 1)] = np.zeros((layers[i], 1))
 
     @property
@@ -68,19 +66,17 @@ class DeepNeuralNetwork():
         return self.__weights
 
     @staticmethod
-    def apply_activation(z, activation):
+    def activation_function(z, formula='sigmoid'):
         """
-        calculates the activation function
+        calculates the sigmoid activation function
         """
-        if activation == 'sig':
+        if formula == 'sigmoid':
             return 1 / (1 + np.exp(-z))
-        elif activation == 'tanh':
+        elif formula == 'tanh':
             return np.tanh(z)
-        elif activation == 'softmax':
+        elif formula == 'softmax':
             e_z = np.exp(z - np.max(z, axis=0, keepdims=True))
             return e_z / np.sum(e_z, axis=0, keepdims=True)
-        print("Unsupported activation function.")
-        return None
 
     def forward_prop(self, X):
         """
@@ -100,13 +96,13 @@ class DeepNeuralNetwork():
             # calculate the activation of the neurons
             Z = np.dot(W, A_prev) + b
             # apply the activation function
-            A = self.apply_activation(Z, self.activation)
+            A = self.activation_function(Z)
             self.__cache['A' + str(i)] = A
         W_last = self.weights['W' + str(self.L)]
         b_last = self.weights['b' + str(self.L)]
         A_prev = self.__cache['A' + str(self.L - 1)]
         Z = np.dot(W_last, A_prev) + b_last
-        A = self.apply_activation(Z, 'softmax')
+        A = self.activation_function(Z, 'softmax')
         self.__cache['A' + str(self.L)] = A
         return A, self.__cache
 
@@ -121,7 +117,7 @@ class DeepNeuralNetwork():
         # Calculate binary cross-entropy loss for each class and sum
         m = Y.shape[1]
         cost = -np.sum(Y * np.log(A)) / m
-        return np.squeeze(cost)
+        return cost
 
     def evaluate(self, X, Y):
         """
@@ -133,60 +129,45 @@ class DeepNeuralNetwork():
         """
         A, _ = self.forward_prop(X)
         cost = self.cost(Y, A)
-        prediction = (A >= 0.5).astype(int)
+        prediction = np.argmax(A, axis=0)
         one_hot_prediction = np.zeros_like(A)
         one_hot_prediction[prediction, np.arange(A.shape[1])] = 1
         return one_hot_prediction, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
         """
-        Perform one iteration of gradient descent (backpropagation) for the neural network.
-
-        Args:
-            Y (numpy.ndarray): True labels, shape (1, m)
-            cache (dict): Dictionary containing activations ('A0', 'A1', ..., 'AL')
-            alpha (float): Learning rate
-
-        Updates:
-            self.weights: Modifies weights and biases in-place
+        Calculates one pass of gradient descent on the neural network.
+        Y: numpy.ndarray with shape (classes, m) - correct labels
+        cache: dict - contains all intermediary values
+        alpha: learning rate
         """
         m = Y.shape[1]
-        dZ = cache['A' + str(self.L)] - Y  # Output layer error
+        A = cache['A' + str(self.L)]
+        dZ = A - Y  # only for the output layer
 
-        for l in range(self.L, 0, -1):
-            A_prev = cache['A' + str(l - 1)]
-            W = self.weights['W' + str(l)]
+        for i in range(self.L, 0, -1):
+            A_prev = cache['A' + str(i - 1)]
+            W = self.weights['W' + str(i)]
 
-            # Compute gradients
             dW = np.dot(dZ, A_prev.T) / m
             db = np.sum(dZ, axis=1, keepdims=True) / m
 
-            # Update parameters
-            self.weights['W' + str(l)] -= alpha * dW
-            self.weights['b' + str(l)] -= alpha * db
+            if i > 1:
+                A_prev = cache['A' + str(i - 1)]
+                dA_prev = np.dot(W.T, dZ)
 
-            # Backpropagate the error if not at the first layer
-            if l > 1:
-                if self.activation == 'sig':
-                    dZ = np.dot(W.T, dZ) * self.sigmoid_derivative(A_prev)
-                elif self.activation == 'tanh':
-                    dZ = np.dot(W.T, dZ) * self.tanh_derivative(A_prev)
+                if self.activation == "sig":
+                    dZ = dA_prev * (A_prev * (1 - A_prev))
+                elif self.activation == "tanh":
+                    dZ = dA_prev * (1 - A_prev ** 2)
                 else:
-                    raise ValueError(f"Unsupported activation: {self.activation}")
+                    raise ValueError("Unsupported activation function: {}".format(self.activation))
 
-    @staticmethod
-    def sigmoid_derivative(a):
-        """
-        calculates the derivative of the sigmoid function
-        """
-        return (a * (1 - a))
+            self.weights['W' + str(i)] -= alpha * dW
+            self.weights['b' + str(i)] -= alpha * db
 
-    @staticmethod
-    def tanh_derivative(a):
-        """
-        calculates the derivative of the tanh function
-        """
-        return (1 - np.square(a))
+
+
 
     @staticmethod
     def plot_graph(cost, step):
@@ -204,7 +185,7 @@ class DeepNeuralNetwork():
         plt.title('Training Cost')
         plt.show()
 
-    def train(self, X, Y, iterations=5000, alpha=0.01, verbose=True,
+    def train(self, X, Y, iterations=5000, alpha=0.05, verbose=True,
               graph=True, step=100):
         """
         trains the deep neural network

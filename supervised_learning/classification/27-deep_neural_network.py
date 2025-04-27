@@ -232,7 +232,7 @@ class DeepNeuralNetwork():
         """
         import pickle
         try:
-            with open(filename, '+rb') as f:
+            with open(filename, 'rb') as f:
                 return pickle.load(f)
         except Exception:
             return None
