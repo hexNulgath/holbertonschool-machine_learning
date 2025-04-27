@@ -21,7 +21,6 @@ X_test = X_test_3D.reshape((X_test_3D.shape[0], -1)).T
 Y_train_one_hot = one_hot_encode(Y_train, 10)
 Y_valid_one_hot = one_hot_encode(Y_valid, 10)
 Y_test_one_hot = one_hot_encode(Y_test, 10)
-"""
 print('Sigmoid activation:')
 deep27 = Deep27.load('27-output.pkl')
 A_one_hot27, cost27 = deep27.evaluate(X_train, Y_train_one_hot)
@@ -48,7 +47,6 @@ for i in range(100):
     plt.axis('off')
 plt.tight_layout()
 plt.show()
-"""
 print('\nTanh activaiton:')
 
 deep28 = Deep28.load('28-saved.pkl')

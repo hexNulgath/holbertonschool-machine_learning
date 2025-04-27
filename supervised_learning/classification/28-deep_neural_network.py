@@ -70,7 +70,7 @@ class DeepNeuralNetwork():
     @staticmethod
     def activation_function(z, formula='sig'):
         """
-        calculates the sigmoid activation function
+        calculates the activation function
         """
         if formula == 'sig':
             return 1 / (1 + np.exp(-z))
@@ -149,7 +149,6 @@ class DeepNeuralNetwork():
             db = np.sum(dZ, axis=1, keepdims=True) / m
 
             if i > 1:
-                A_prev = cache['A' + str(i - 1)]
                 dA_prev = np.dot(W.T, dZ)
 
                 if self.activation == "sig":
@@ -211,21 +210,21 @@ class DeepNeuralNetwork():
                 raise TypeError("step must be an integer")
             if step < 1 or step > iterations:
                 raise ValueError("step must be positive and <= iterations")
-        Cost_list = []
+        cost_list = []
         for i in range(iterations):
             self.forward_prop(X)
             if i % step == 0 and verbose:
                 cost = self.cost(Y, self.cache['A' + str(self.L)])
                 if graph:
-                    Cost_list.append(cost)
+                    cost_list.append(cost)
                 print("Cost after {} iterations: {}".format(i, cost))
             self.gradient_descent(Y, self.cache, alpha)
         cost = self.cost(Y, self.cache['A' + str(self.L)])
         if verbose:
             print("Cost after {} iterations: {}".format(iterations, cost))
         if graph:
-            Cost_list.append(cost)
-            self.plot_graph(Cost_list, step)
+            cost_list.append(cost)
+            self.plot_graph(cost_list, step)
         return self.evaluate(X, Y)
 
     def save(self, filename):
@@ -234,7 +233,7 @@ class DeepNeuralNetwork():
         filename is the file to save the instance to
         """
         import pickle
-        if filename[-4:] != '.pkl':
+        if not filename.endswith('.pkl'):
             filename += '.pkl'
         with open(filename, 'wb') as f:
             pickle.dump(self, f)
