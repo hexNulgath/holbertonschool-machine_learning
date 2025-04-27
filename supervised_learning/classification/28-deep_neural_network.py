@@ -68,11 +68,11 @@ class DeepNeuralNetwork():
         return self.__weights
 
     @staticmethod
-    def activation_function(z, formula='sigmoid'):
+    def activation_function(z, formula='sig'):
         """
         calculates the sigmoid activation function
         """
-        if formula == 'sigmoid':
+        if formula == 'sig':
             return 1 / (1 + np.exp(-z))
         elif formula == 'tanh':
             return np.tanh(z)
@@ -89,35 +89,16 @@ class DeepNeuralNetwork():
         """
         self.__cache = {'A0': X}
 
-        if self.activation == 'sig':
-            for i in range(1, self.L):
-                # get current layer weights and biases
-                W = self.weights['W' + str(i)]
-                b = self.weights['b' + str(i)]
-                # get input to the neurons
-                A_prev = self.cache['A' + str(i - 1)]
-                # calculate the activation of the neurons
-                Z = np.dot(W, A_prev) + b
-                # apply the activation function
-                A = self.activation_function(Z)
-                self.__cache['A' + str(i)] = A
-            W_last = self.weights['W' + str(self.L)]
-            b_last = self.weights['b' + str(self.L)]
-            A_prev = self.__cache['A' + str(self.L - 1)]
-            Z = np.dot(W_last, A_prev) + b_last
-            A = self.activation_function(Z, 'softmax')
-            self.__cache['A' + str(self.L)] = A
-        else:
-            for i in range(1, self.L + 1):  # include the last layer
-                W = self.weights['W' + str(i)]
-                b = self.weights['b' + str(i)]
-                A_prev = self.cache['A' + str(i - 1)]
-                Z = np.dot(W, A_prev) + b
-                if i == self.L:
-                    A = self.activation_function(Z, 'softmax')
-                else:
-                    A = self.activation_function(Z, self.activation)
-                self.__cache['A' + str(i)] = A
+        for i in range(1, self.L + 1):  # include the last layer
+            W = self.weights['W' + str(i)]
+            b = self.weights['b' + str(i)]
+            A_prev = self.cache['A' + str(i - 1)]
+            Z = np.dot(W, A_prev) + b
+            if i == self.L:
+                A = self.activation_function(Z, 'softmax')
+            else:
+                A = self.activation_function(Z, self.activation)
+            self.__cache['A' + str(i)] = A
 
         return A, self.__cache
 
