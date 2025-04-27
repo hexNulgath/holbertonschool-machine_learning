@@ -21,6 +21,8 @@ class DeepNeuralNetwork():
             raise ValueError("nx must be a positive integer")
         if type(layers) is not list or layers == []:
             raise TypeError("layers must be a list of positive integers")
+        if activation not in ['sig', 'tanh']:
+            raise ValueError("activation must be 'sig' or 'tanh'")
         self.__L = len(layers)
         self.__cache = {}
         self.__weights = {}
@@ -174,7 +176,8 @@ class DeepNeuralNetwork():
                 elif self.activation == "tanh":
                     dZ = dA_prev * (1 - A_prev ** 2)
                 else:
-                    raise ValueError("Unsupported activation function: {}".format(self.activation))
+                    raise ValueError("Unsupported activation function: {}".
+                                     format(self.activation))
 
             self.weights['W' + str(i)] -= alpha * dW
             self.weights['b' + str(i)] -= alpha * db
