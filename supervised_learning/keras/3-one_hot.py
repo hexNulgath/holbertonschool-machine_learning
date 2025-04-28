@@ -2,7 +2,7 @@
 """
 one-hot encoding
 """
-import tensorflow as tf
+import tensorflow.keras as K
 
 
 def one_hot(labels, classes=None):
@@ -17,5 +17,5 @@ def one_hot(labels, classes=None):
         a one-hot encoding of labels with shape (m, classes)
     """
     if classes is None:
-        return tf.one_hot(labels, labels.max() + 1)
-    return tf.one_hot(labels, classes)
+        return K.backend.one_hot(labels, labels.max() + 1)
+    return K.backend.one_hot(labels, classes)
