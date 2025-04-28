@@ -27,16 +27,14 @@ used for each layer of the network
         kernel_regularizer=K.regularizers.l2(lambtha),
         input_shape=(nx,),
     ))
-    model.add(K.layers.Dropout(1 - keep_prob))
 
     # Add remaining layers
     for i in range(1, len(layers)):
+        model.add(K.layers.Dropout(1 - keep_prob))
         model.add(K.layers.Dense(
             layers[i],
             activation=activations[i],
             kernel_regularizer=K.regularizers.l2(lambtha),
         ))
-        if i < len(layers) - 1:
-            model.add(K.layers.Dropout(1 - keep_prob))
 
     return model
