@@ -11,4 +11,4 @@ if __name__ == '__main__':
     print(model.loss)
     opt = model.optimizer
     print(opt.__class__)
-    print((opt.lr.numpy(), opt.beta_1, opt.beta_2))
+    print((opt.learning_rate.numpy(), opt.beta_1, opt.beta_2))
