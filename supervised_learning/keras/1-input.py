@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-import tensorflow.keras as K
 """
 Builds a neural network with the Keras Sequential API.
 """
+import tensorflow.keras as K
 
 
 def build_model(nx, layers, activations, lambtha, keep_prob):
