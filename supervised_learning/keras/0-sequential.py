@@ -2,8 +2,7 @@
 """
     This function builds a neural network with the Keras Sequential API.
 """
-import tensorflow as tf
-from keras import layers as k_layers
+import tensorflow.keras as K
 
 
 def build_model(nx, layers, activations, lambtha, keep_prob):
@@ -19,25 +18,25 @@ used for each layer of the network
     You are not allowed to use the Input class
     Returns: the keras model
     """
-    model = tf.keras.Sequential()
+    model = K.Sequential()
 
     # Add first layer with input shape
-    model.add(k_layers.Dense(
+    model.add(K.layers.Dense(
         layers[0],
         activation=activations[0],
-        kernel_regularizer=tf.keras.regularizers.l2(lambtha),
+        kernel_regularizer=K.regularizers.l2(lambtha),
         input_shape=(nx,),
     ))
-    model.add(k_layers.Dropout(1 - keep_prob))
+    model.add(K.layers.Dropout(1 - keep_prob))
 
     # Add remaining layers
     for i in range(1, len(layers)):
-        model.add(k_layers.Dense(
+        model.add(K.layers.Dense(
             layers[i],
             activation=activations[i],
-            kernel_regularizer=tf.keras.regularizers.l2(lambtha),
+            kernel_regularizer=K.regularizers.l2(lambtha),
         ))
         if i < len(layers) - 1:
-            model.add(k_layers.Dropout(1 - keep_prob))
+            model.add(K.layers.Dropout(1 - keep_prob))
 
     return model
