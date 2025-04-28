@@ -19,8 +19,8 @@ def optimize_model(network, alpha, beta1, beta2):
     """
     # Create the optimizer with the required parameters
     optimizer = K.optimizers.Adam(learning_rate=alpha,
-                                    beta_1=beta1,
-                                    beta_2=beta2)
+                                  beta_1=beta1,
+                                  beta_2=beta2)
 
     # Compile the model with the optimizer
     network.compile(optimizer=optimizer,
