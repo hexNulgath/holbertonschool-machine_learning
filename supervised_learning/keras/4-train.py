@@ -2,7 +2,7 @@
 """
 trains a model using mini-batch gradient descent
 """
-import tensorflow.keras as keras
+import tensorflow.keras as K
 
 
 def train_model(network, data, labels, batch_size,
