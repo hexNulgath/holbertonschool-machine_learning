@@ -2,7 +2,7 @@
 """
 Functions to save and load a network
 """
-import tensorflow.keras as k
+import tensorflow.keras as K
 
 
 def save_model(network, filename):
@@ -23,4 +23,4 @@ def load_model(filename):
     model should be loaded from
     Returns: the loaded model
     """
-    return k.models.load_model(filename)
+    return K.models.load_model(filename)
