@@ -6,7 +6,7 @@ load_model = __import__('9-model').load_model
 test_model = __import__('12-test').test_model
 
 if __name__ == '__main__':
-    datasets = np.load('MNIST.npz')
+    datasets = np.load('../data/MNIST.npz')
     X_test = datasets['X_test']
     X_test = X_test.reshape(X_test.shape[0], -1)
     Y_test = datasets['Y_test']
