@@ -7,7 +7,7 @@ predict = __import__('13-predict').predict
 
 
 if __name__ == '__main__':
-    datasets = np.load('MNIST.npz')
+    datasets = np.load('../data/MNIST.npz')
     X_test = datasets['X_test']
     X_test = X_test.reshape(X_test.shape[0], -1)
     Y_test = datasets['Y_test']
