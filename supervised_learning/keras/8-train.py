@@ -9,7 +9,7 @@ def train_model(network, data, labels, batch_size, epochs,
                 validation_data=None, early_stopping=False,
                 patience=0, learning_rate_decay=False,
                 alpha=0.1, decay_rate=1, save_best=False,
-                filepath=None,verbose=True, shuffle=False):
+                filepath=None, verbose=True, shuffle=False):
     """
     Trains a model using mini-batch gradient descent.
 
@@ -38,8 +38,8 @@ def train_model(network, data, labels, batch_size, epochs,
             each time the learning rate updates, Keras should print a message
         alpha: is the initial learning rate
         decay_rate: is the decay rate
-        save_best: is a boolean indicating whether to save the model after each
-            epoch if it is the best
+        save_best: is a boolean indicating whether to save
+            the model after each epoch if it is the best
             a model is considered the best if its validation
             loss is the lowest that the model has obtained
         filepath: is the file path where the model should be saved
@@ -61,6 +61,13 @@ def train_model(network, data, labels, batch_size, epochs,
                 patience=patience,
             )
         )
+    if save_best and validation_data is not None:
+        callbaacks.append(
+            K.callbacks.ModelCheckpoint(
+                filepath=filepath,
+                save_best_only=True
+            )
+        )
     if validation_data is None:
         history = network.fit(
             data, labels, batch_size=batch_size,
@@ -72,8 +79,5 @@ def train_model(network, data, labels, batch_size, epochs,
             epochs=epochs, verbose=verbose,
             shuffle=shuffle, validation_data=validation_data,
             callbacks=callbaacks)
-    if save_best and validation_data is not None:
-        if network.validation_loss < network.best_validation_loss:
-            network.best_validation_loss = network.validation_loss
-        network.save(filepath)
+
     return history
