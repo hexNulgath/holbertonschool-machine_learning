@@ -21,10 +21,12 @@ def create_mini_batches(X, Y, batch_size):
     batch_list = []
     full_size = m // batch_size
     X, Y = shuffle_data(X, Y)
+    # separate the batches that are of full size
     for i in range(0, full_size):
         X_batch = X[i * batch_size:(i + 1) * batch_size]
         Y_batch = Y[i * batch_size:(i + 1) * batch_size]
         batch_list.append((X_batch, Y_batch))
+    # separate the batch that is smaller in size
     if m % batch_size != 0:
         X_batch = X[full_size * batch_size:]
         Y_batch = Y[full_size * batch_size:]
