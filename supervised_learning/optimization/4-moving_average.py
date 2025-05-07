@@ -9,7 +9,11 @@ def moving_average(data, beta):
     beta is the weight used for the moving average
     Returns: a list containing the moving averages of data
     """
-    wma = [data[0]]
-    for i in range(1, len(data)):
-        wma.append(beta * data[i] + (1 - beta) * wma[i - 1])
-    return wma
+    average = 0
+    moving_averages = []
+    for i, data in enumerate(data):
+        average = beta * average + (1 - beta) * data
+        # Apply bias correction
+        average_corrected = average / (1 - beta ** (i + 1))
+        moving_averages.append(average_corrected)
+    return moving_averages
