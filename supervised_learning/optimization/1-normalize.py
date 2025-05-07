@@ -2,7 +2,6 @@
 """
 1-normalize.py
 """
-import tensorflow as tf
 import numpy as np
 
 
@@ -20,8 +19,5 @@ def normalize(X, m, s):
     """
     normalized_X = np.ndarray(X.shape)
     for row in range(X.shape[0]):
-        normalized_X[row] = tf.nn.batch_normalization(
-            X[row], mean=m, variance=s**2,
-            offset=None, scale=None,
-            variance_epsilon=1e-8)
+        normalized_X[row] = ((X[row] - m) / s)
     return normalized_X
