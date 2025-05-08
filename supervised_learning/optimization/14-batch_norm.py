@@ -18,7 +18,6 @@ def create_batch_norm_layer(prev, n, activation):
         units=n,
         kernel_initializer=tf.keras.initializers.VarianceScaling(
             mode='fan_avg'),
-        activation=activation,
     )(prev)
 
     # Apply batch normalization to the dense layer output
@@ -27,4 +26,4 @@ def create_batch_norm_layer(prev, n, activation):
         gamma_initializer='ones',
         beta_initializer='zeros')(dense_layer)
 
-    return batch_norm_layer
+    return tf.keras.layers.Activation(activation)(batch_norm_layer)
