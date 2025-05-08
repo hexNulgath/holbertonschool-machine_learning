@@ -16,7 +16,8 @@ def update_variables_Adam(alpha, beta1, beta2, epsilon, var, grad, v, s, t):
     v is the previous first moment of var
     s is the previous second moment of var
     t is the time step used for bias correction
-    Returns: the updated variable, the new first moment, and the new second moment, respectively
+    Returns: the updated variable, the new first moment,
+    and the new second moment, respectively
     """
     momentum = beta1 * v + (1 - beta1) * grad
     velocity = beta2 * s + (1 - beta2) * grad ** 2
