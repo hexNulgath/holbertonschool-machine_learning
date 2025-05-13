@@ -21,8 +21,7 @@ def create_confusion_matrix(labels, logits):
     true_classes = np.argmax(labels, axis=1)
     pred_classes = np.argmax(logits, axis=1)
     size = labels.shape[1]
-    matrix = np.zeros((size, size), dtype=int)
-    print(matrix)
+    matrix = np.zeros((size, size))
 
     for i in range(size):
         for j in range(size):
