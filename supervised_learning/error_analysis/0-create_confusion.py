@@ -18,13 +18,16 @@ def create_confusion_matrix(labels, logits):
         numpy.ndarray: confusion matrix
     """
     # Find the maximum class index in either labels or logits
-    size = max(np.max(labels), np.max(logits)) + 1
-    size = int(size)
+    true_classes = np.argmax(labels, axis=1)
+    pred_classes = np.argmax(logits, axis=1)
+    size = labels.shape[1]
     matrix = np.zeros((size, size), dtype=int)
+    print(matrix)
 
     for i in range(size):
         for j in range(size):
-            mask = labels == i
-            matrix[i, j] = (logits[mask] == j).sum()
+            matrix[i, j] += np.sum(
+                (true_classes == i) & (pred_classes == j)
+            )
 
     return matrix
