@@ -31,8 +31,8 @@ def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
             dZ = dA_prev * (1 - cache['A' + str(i - 1)] ** 2)
 
     # Update weights and biases (in-place)
-    for l in range(1, L + 1):
-        weights[f"W{l}"] -= alpha * grads[f"dW{l}"]
-        weights[f"b{l}"] -= alpha * grads[f"db{l}"]
+    for i in range(1, L + 1):
+        weights[f"W{i}"] -= alpha * grads[f"dW{i}"]
+        weights[f"b{i}"] -= alpha * grads[f"db{i}"]
 
     return weights
