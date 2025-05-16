@@ -23,6 +23,7 @@ def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
     grads = {}
     dZ = cache['A' + str(L)] - Y
     for i in range(L, 0, -1):
+        # Compute gradients for current layer
         grads['dW' + str(i)] = (dZ @ cache['A' + str(i - 1)].T) / \
             m + (lambtha / m) * weights['W' + str(i)]
         grads['db' + str(i)] = dZ.sum(axis=1, keepdims=True) / m
