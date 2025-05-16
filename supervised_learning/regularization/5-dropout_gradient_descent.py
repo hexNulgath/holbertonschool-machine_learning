@@ -22,29 +22,22 @@ def dropout_gradient_descent(Y, weights, cache, alpha, keep_prob, L):
     L: number of layers of the network
     """
     m = Y.shape[1]  # Number of examples
-    dZ = {}  # To store gradients of each layer
+    A_output = cache['A' + str(L)]
+    dZ = A_output - Y  # Softmax derivative (cross-entropy loss)
+    grads = {}
 
-    # Backpropagation through the network
-    for i in range(L, 0, -1):
-        if i == L:
-            # Output layer gradient (assuming softmax activation)
-            dZ[str(L)] = cache['A' + str(L)] - Y
-        else:
-            # Hidden layers gradient (assuming tanh activation)
-            dA = np.matmul(weights['W' + str(i+1)].T, dZ[str(i+1)])
-            # Apply dropout mask and scale by keep_prob
-            if 'D' + str(i) in cache:
-                dA *= cache['D' + str(i)]
-                # Inverted dropout scaling
-                dA /= keep_prob
-            # tanh derivative
-            dZ[str(i)] = dA * (1 - np.power(cache['A' + str(i)], 2))
+    for l in range(L, 0, -1):
+        A_prev = cache['A' + str(l-1)]
+        grads['dW' + str(l)] = np.dot(dZ, A_prev.T) / m
+        grads['db' + str(l)] = np.sum(dZ, axis=1, keepdims=True) / m
 
-        # Compute weight and bias gradients
-        A_prev = cache['A' + str(i-1)] if i > 1 else cache['A0']
-        dW = np.matmul(dZ[str(i)], A_prev.T) / m
-        db = np.sum(dZ[str(i)], axis=1, keepdims=True) / m
+        if l > 1:  # Not input layer
+            dA = np.dot(weights['W' + str(l)].T, dZ)
+            if l < L:  # Hidden layers (apply dropout)
+                dA *= cache['D' + str(l-1)]  # Apply mask
+                dA /= keep_prob  # Scale to maintain expected value
+            dZ = dA * (1 - np.square(A_prev))  # Tanh derivative (1 - tanh²)
 
-        # Update weights
-        weights['W' + str(i)] -= alpha * dW
-        weights['b' + str(i)] -= alpha * db
+        # Update weights (learning rate applied here)
+        weights['W' + str(l)] -= alpha * grads['dW' + str(l)]
+        weights['b' + str(l)] -= alpha * grads['db' + str(l)]
