@@ -12,6 +12,13 @@ def l2_reg_cost(cost, model):
     Returns: tensor containing the total cost for each layer of the network,
         accounting for L2 regularization
     """
-    total_loss = cost + tf.add_n(model.losses)
+    l2_costs = []
 
-    return total_loss
+    for layer in model.layers:
+        if not isinstance(layer, tf.keras.layers.InputLayer):
+            # Get the L2 regularization loss for this layer
+            layer_l2 = tf.reduce_sum(layer.losses) + cost
+            l2_costs.append(layer_l2)
+
+    # Return as tensor
+    return tf.convert_to_tensor(l2_costs)
