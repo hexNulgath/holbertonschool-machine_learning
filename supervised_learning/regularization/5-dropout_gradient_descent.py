@@ -26,18 +26,17 @@ def dropout_gradient_descent(Y, weights, cache, alpha, keep_prob, L):
     dZ = A_output - Y  # Softmax derivative (cross-entropy loss)
     grads = {}
 
-    for l in range(L, 0, -1):
-        A_prev = cache['A' + str(l-1)]
-        grads['dW' + str(l)] = np.dot(dZ, A_prev.T) / m
-        grads['db' + str(l)] = np.sum(dZ, axis=1, keepdims=True) / m
+    for i in range(L, 0, -1):
+        A_prev = cache['A' + str(i-1)]
+        grads['dW' + str(i)] = np.dot(dZ, A_prev.T) / m
+        grads['db' + str(i)] = np.sum(dZ, axis=1, keepdims=True) / m
 
-        if l > 1:  # Not input layer
-            dA = np.dot(weights['W' + str(l)].T, dZ)
-            if l < L:  # Hidden layers (apply dropout)
-                dA *= cache['D' + str(l-1)]  # Apply mask
-                dA /= keep_prob  # Scale to maintain expected value
-            dZ = dA * (1 - np.square(A_prev))  # Tanh derivative (1 - tanh²)
+        if i > 1:  # Not input layer
+            dA = np.matmul(weights['W' + str(i)].T, dZ)
+            dA *= cache['D' + str(i-1)]  # Apply mask
+            dA /= keep_prob  # Scale to maintain expected value
+            dZ = dA * (1 - np.power(A_prev, 2))  # Tanh derivative (1 - tanh²)
 
         # Update weights (learning rate applied here)
-        weights['W' + str(l)] -= alpha * grads['dW' + str(l)]
-        weights['b' + str(l)] -= alpha * grads['db' + str(l)]
+        weights['W' + str(i)] -= alpha * grads['dW' + str(i)]
+        weights['b' + str(i)] -= alpha * grads['db' + str(i)]
