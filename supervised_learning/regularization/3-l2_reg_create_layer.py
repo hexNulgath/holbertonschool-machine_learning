@@ -15,6 +15,10 @@ def l2_reg_create_layer(prev, n, activation, lambtha):
     lambtha is the L2 regularization parameter
     Returns: the output of the new layer
     """
+    l2_regularizer = tf.keras.regularizers.L2(lambtha)
+
     layer = tf.keras.layers.Dense(
-        n, activation=activation, kernel_regularizer=tf.keras.regularizers.l2(lambtha))(prev)
-    return layer
+        n, activation=activation, kernel_regularizer=l2_regularizer)
+    layer_output = layer(prev)
+
+    return layer_output
