@@ -28,8 +28,7 @@ def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
         grads['db' + str(i)] = dZ.sum(axis=1, keepdims=True) / m
         if i > 1:  # Propagate gradient through tanh
             dA_prev = weights[f"W{i}"].T @ dZ
-            Z_prev = cache[f"A{i-1}"]
-            dZ = dA_prev * (1 - np.tanh(Z_prev) ** 2)  # tanh derivative
+            dZ = dA_prev * (1 - cache['A' + str(i - 1)] ** 2)
 
     # Update weights and biases (in-place)
     for l in range(1, L + 1):
