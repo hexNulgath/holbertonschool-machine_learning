@@ -19,14 +19,20 @@ def convolve_grayscale_valid(images, kernel):
     Returns: a numpy.ndarray containing the convolved images
     """
     m, n = kernel.shape
+    if m != n:
+        raise ValueError("Kernel must be square (m == n)")
+
     z, y, x = images.shape
     y_out = y - m + 1
     x_out = x - m + 1
     new_image = np.zeros((z, y_out, x_out))
 
-    for l in range(z):
-        for i in range(y_out):
-            for j in range(x_out):
-                new_image[l, i, j] = np.sum(images[l, i:i+m, j:j+m] * kernel)
+    for j in range(z):  # Loop over each image in the batch
+        for i in range(y_out):  # Loop over rows
+            # Extract all possible (m, m) patches in the current row
+            patches = np.lib.stride_tricks.sliding_window_view(
+                images[j], (m, m))[i, :x_out]
+            # Compute the sum of element-wise multiplication with the kernel
+            new_image[j, i] = np.sum(patches * kernel, axis=(1, 2))
 
     return new_image
