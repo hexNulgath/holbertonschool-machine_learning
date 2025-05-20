@@ -25,11 +25,11 @@ def convolve_grayscale_padding(images, kernel, padding):
     ph, pw = padding
 
     # Height padding
-    pad_h_l = ph if ph is not None else kh // 2
+    pad_h_l = ph // 2 if ph is not None else kh // 2
     pad_h_r = (kh - 1 - pad_h_l) if kh % 2 == 0 else pad_h_l
 
     # Width padding
-    pad_w_l = pw if pw is not None else kw // 2
+    pad_w_l = pw // 2 if pw is not None else kw // 2
     pad_w_r = (kw - 1 - pad_w_l) if kw % 2 == 0 else pad_w_l
 
     padded_images = np.pad(
