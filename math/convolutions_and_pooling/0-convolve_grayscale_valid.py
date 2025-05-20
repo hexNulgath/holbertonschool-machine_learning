@@ -18,21 +18,17 @@ def convolve_grayscale_valid(images, kernel):
         kw is the width of the kernel
     Returns: a numpy.ndarray containing the convolved images
     """
-    m, n = kernel.shape
-    if m != n:
-        raise ValueError("Kernel must be square (m == n)")
+    m, h, w = images.shape
+    kh, kw = kernel.shape
+    conv_h = h - kh + 1
+    conv_w = w - kw + 1
+    output = np.zeros((m, conv_h, conv_w))
 
-    z, y, x = images.shape
-    y_out = y - m + 1
-    x_out = x - m + 1
-    new_image = np.zeros((z, y_out, x_out))
+    for i in range(conv_h):
+        for j in range(conv_w):
+            # Extract the region from each image that aligns with the kernel
+            region = images[:, i:i+kh, j:j+kw]
+            # Apply the kernel by element-wise multiplication and sum
+            output[:, i, j] = np.sum(region * kernel, axis=(1, 2))
 
-    for j in range(z):  # Loop over each image in the batch
-        for i in range(y_out):  # Loop over rows
-            # Extract all possible (m, m) patches in the current row
-            patches = np.lib.stride_tricks.sliding_window_view(
-                images[j], (m, m))[i, :x_out]
-            # Compute the sum of element-wise multiplication with the kernel
-            new_image[j, i] = np.sum(patches * kernel, axis=(1, 2))
-
-    return new_image
+    return output
