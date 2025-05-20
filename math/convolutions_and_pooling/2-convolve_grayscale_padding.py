@@ -29,11 +29,8 @@ def convolve_grayscale_padding(images, kernel, padding):
         pad_h_l = ph
         pad_h_r = ph
     else:
-        pad_h_l = kh // 2
-        if kh % 2 == 0:
-            pad_h_r = (kh - 1 - pad_h_l)
-        else:
-            pad_h_r = pad_h_l
+        pad_h_l = 0
+        pad_h_r = 0
 
     # Width padding
     if pw:
