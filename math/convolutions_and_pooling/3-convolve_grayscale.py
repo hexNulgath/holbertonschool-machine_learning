@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Corrected convolution operation for grayscale images"""
+"""Final corrected convolution operation for grayscale images"""
 
 import numpy as np
 
@@ -23,7 +23,7 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
 
     # Calculate padding
     if padding == 'same':
-        # Calculate output dimensions for same padding
+        # Calculate output dimensions
         out_h = int(np.ceil(h / sh))
         out_w = int(np.ceil(w / sw))
 
@@ -37,11 +37,12 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
         pad_left = pad_w // 2
         pad_right = pad_w - pad_left
 
-        # Apply padding
+        # Apply padding with zero values
         padded_images = np.pad(
             images,
             pad_width=((0, 0), (pad_top, pad_bottom), (pad_left, pad_right)),
-            mode='constant'
+            mode='constant',
+            constant_values=0
         )
     elif padding == 'valid':
         pad_top, pad_bottom, pad_left, pad_right = 0, 0, 0, 0
@@ -51,7 +52,8 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
         padded_images = np.pad(
             images,
             pad_width=((0, 0), (ph, ph), (pw, pw)),
-            mode='constant'
+            mode='constant',
+            constant_values=0
         )
         pad_top, pad_bottom = ph, ph
         pad_left, pad_right = pw, pw
