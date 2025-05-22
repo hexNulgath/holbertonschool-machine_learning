@@ -47,7 +47,8 @@ def pool(images, kernel_shape, stride, mode='max'):
                     axis=(1, 2)
                 )
             else:
-                output[:, i, j, :] = np.mean(images[:, h_start:h_end, w_start:w_end, :],
-                                             axis=(1, 2))
+                output[:, i, j, :] = np.mean(
+                    images[:, h_start:h_end, w_start:w_end, :],
+                    axis=(1, 2))
 
     return output
