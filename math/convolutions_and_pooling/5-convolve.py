@@ -58,13 +58,18 @@ def convolve(images, kernels, padding='same', stride=(1, 1)):
     output = np.zeros((m, oh, ow, nc))
 
     # Perform convolution
+    # Reshape to (1, kh, kw, kc, nc)
     kernels = kernels.reshape((1, *kernels.shape))
+
     for i in range(oh):
         for j in range(ow):
             h_start = i * sh
             h_end = h_start + kh
             w_start = j * sw
             w_end = w_start + kw
+            # patch: (m, kh, kw, c, 1)
+            # kernels: (1, kh, kw, c, nc)
+            # output: (m, kh, kw, c, nc)
             output[:, i, j, :] = np.sum(
                 padded_images[:, h_start:h_end, w_start:w_end,
                               :, None] * kernels,
