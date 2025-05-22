@@ -56,12 +56,12 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
         mode='constant')
 
     # Initialize output array
-    out_h = (h + pad_top + pad_bottom - kh) // sh + 1
-    out_w = (w + pad_left + pad_right - kw) // sw + 1
-    output = np.zeros((m, out_h, out_w))
+    oh = (h + 2 * ph - kh) // sh + 1
+    ow = (w + 2 * pw - kw) // sw + 1
+    output = np.zeros((m, oh, ow))
     # Perform convolution
-    for i in range(out_h):
-        for j in range(out_w):
+    for i in range(oh):
+        for j in range(ow):
             h_start = i * sh
             w_start = j * sw
             h_end = h_start + kh
