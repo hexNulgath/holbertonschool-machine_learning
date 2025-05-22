@@ -35,10 +35,19 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     if padding == 'same':
         pad_h = ((h - 1) * sh + kh - h) // 2
         pad_w = ((w - 1) * sw + kw - w) // 2
+        # Compute output dimensions
+        conv_h = (h + 2 * pad_h - kh) // sh + 1
+        conv_w = (w + 2 * pad_w - kw) // sw + 1
     elif padding == 'valid':
         pad_h, pad_w = 0, 0
+        # Compute output dimensions
+        conv_h = (h - kh) // sh + 1
+        conv_w = (w-kw)//sw+1
     else:
         pad_h, pad_w = padding
+        # Compute output dimensions
+        conv_h = (h + 2 * pad_h - kh) // sh + 1
+        conv_w = (w + 2 * pad_w - kw) // sw + 1
 
     # Pad images symmetrically
     padded_images = np.pad(
@@ -47,9 +56,6 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
         mode='constant'
     )
 
-    # Compute output dimensions
-    conv_h = (h + 2 * pad_h - kh) // sh + 1
-    conv_w = (w + 2 * pad_w - kw) // sw + 1
     output = np.zeros((m, conv_h, conv_w))
 
     # Perform convolution
