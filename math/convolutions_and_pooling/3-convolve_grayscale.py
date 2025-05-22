@@ -34,8 +34,8 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     # --- Padding Logic ---
     if padding == 'same':
         # Ensure padding is symmetric and integer-valued
-        pad_h = (kh - 1) // 2
-        pad_w = (kw - 1) // 2
+        pad_h = ((h - 1) * sh - h + kh) // 2
+        pad_w = ((w - 1) * sw - w + kw) // 2
     elif padding == 'valid':
         pad_h, pad_w = 0, 0
     else:
