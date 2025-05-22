@@ -33,26 +33,17 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
 
     # Calculate output dimensions and padding
     if padding == 'same':
-        # Calculate required padding
         ph = ((h - 1) * sh + kh - h) // 2 + 1
         pw = ((w - 1) * sw + kw - w) // 2 + 1
-
-        # Split padding equally on both sides
-        pad_top = ph // 2
-        pad_bottom = ph - pad_top
-        pad_left = pw // 2
-        pad_right = pw - pad_left
     elif padding == 'valid':
-        pad_top = pad_bottom = pad_left = pad_right = ph = pw = 0
+        ph = pw = 0
     else:  # custom padding
         ph, pw = padding
-        pad_top = pad_bottom = ph
-        pad_left = pad_right = pw
 
     # Apply padding with zeros
     padded_images = np.pad(
         images,
-        ((0, 0), (pad_top, pad_bottom), (pad_left, pad_right)),
+        ((0, 0), (ph, ph), (pw, pw)),
         mode='constant')
 
     # Initialize output array
