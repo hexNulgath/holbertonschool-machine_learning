@@ -1,27 +1,37 @@
 #!/usr/bin/env python3
-"""Final corrected convolution operation for grayscale images"""
-
+"""3-convolve_grayscale.py"""
 import numpy as np
 
 
 def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     """
-    Performs a convolution on grayscale images with given parameters.
+    that performs a convolution on grayscale images:
 
-    Args:
-        images: numpy.ndarray with shape (m, h, w) containing grayscale images
-        kernel: numpy.ndarray with shape (kh, kw) containing convolution kernel
-        padding: either 'same', 'valid', or tuple (ph, pw)
-        stride: tuple (sh, sw) specifying stride steps
-
-    Returns:
-        numpy.ndarray containing convolved images
+    images is a numpy.ndarray with shape (m, h, w)
+    containing multiple grayscale images
+        m is the number of images
+        h is the height in pixels of the images
+        w is the width in pixels of the images
+    kernel is a numpy.ndarray with shape (kh, kw)
+    containing the kernel for the convolution
+        kh is the height of the kernel
+        kw is the width of the kernel
+    padding is either a tuple of (ph, pw), ‘same’, or ‘valid’
+        if ‘same’, performs a same convolution
+        if ‘valid’, performs a valid convolution
+        if a tuple:
+            ph is the padding for the height of the image
+            pw is the padding for the width of the image
+    stride is a tuple of (sh, sw)
+        sh is the stride for the height of the image
+        sw is the stride for the width of the image
+    Returns: a numpy.ndarray containing the convolved images
     """
     kh, kw = kernel.shape
     m, h, w = images.shape
     sh, sw = stride
 
-    # Calculate padding
+    # Calculate output dimensions and padding
     if padding == 'same':
         # Calculate output dimensions
         out_h = int(np.ceil(h / sh))
@@ -36,31 +46,24 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
         pad_bottom = pad_h - pad_top
         pad_left = pad_w // 2
         pad_right = pad_w - pad_left
-
-        # Apply padding with zero values
-        padded_images = np.pad(
-            images,
-            pad_width=((0, 0), (pad_top, pad_bottom), (pad_left, pad_right)),
-            mode='constant',
-            constant_values=0
-        )
     elif padding == 'valid':
-        pad_top, pad_bottom, pad_left, pad_right = 0, 0, 0, 0
-        padded_images = images
-    else:
+        pad_top = pad_bottom = pad_left = pad_right = 0
+        out_h = (h - kh) // sh + 1
+        out_w = (w - kw) // sw + 1
+    else:  # custom padding
         ph, pw = padding
-        padded_images = np.pad(
-            images,
-            pad_width=((0, 0), (ph, ph), (pw, pw)),
-            mode='constant',
-            constant_values=0
-        )
-        pad_top, pad_bottom = ph, ph
-        pad_left, pad_right = pw, pw
+        pad_top = pad_bottom = ph
+        pad_left = pad_right = pw
+        out_h = (h + 2 * ph - kh) // sh + 1
+        out_w = (w + 2 * pw - kw) // sw + 1
 
-    # Calculate output dimensions
-    out_h = (h + pad_top + pad_bottom - kh) // sh + 1
-    out_w = (w + pad_left + pad_right - kw) // sw + 1
+    # Apply padding with zeros
+    padded_images = np.pad(
+        images,
+        pad_width=((0, 0), (pad_top, pad_bottom), (pad_left, pad_right)),
+        mode='constant',
+        constant_values=0
+    )
 
     # Initialize output array
     output = np.zeros((m, out_h, out_w))
