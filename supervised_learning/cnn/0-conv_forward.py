@@ -35,38 +35,44 @@ def conv_forward(A_prev, W, b, activation, padding="same", stride=(1, 1)):
 
     Returns: the output of the convolutional layer
     """
-    m, h, w, _ = A_prev.shape
+    m, h_prev, w_prev, c_prev = A_prev.shape
     kh, kw, _, c_new = W.shape
     sh, sw = stride
 
-    # add padding
+    # Calculate padding
     if padding == 'valid':
-        ph, pw = (0, 0)
-    else:  # padding == 'same'
-        ph = ((h - 1) * sh + kh - h) // 2 + 1
-        pw = ((w - 1) * sw + kw - w) // 2 + 1
-    p_input = np.pad(A_prev, ((0, 0), (ph, ph), (pw, pw), (0, 0)))
+        ph, pw = 0, 0
+    else:
+        ph = (((h_prev - 1) * sh + kh - h_prev) // 2)
+        pw = (((w_prev - 1) * sw + kw - w_prev) // 2)
 
-    # Initialize output array
-    oh = (h + 2 * ph - kh) // sh + 1
-    ow = (w + 2 * pw - kw) // sw + 1
+    p_input = np.pad(A_prev,
+                     ((0, 0), (ph, ph), (pw, pw), (0, 0)),
+                     mode='constant')
+
+    # Calculate output dimensions
+    oh = (h_prev + 2 * ph - kh) // sh + 1
+    ow = (w_prev + 2 * pw - kw) // sw + 1
     conv_layer = np.zeros((m, oh, ow, c_new))
-    # Perform convolution
-    # Reshape to (1, kh, kw, kc, nc)
-    W = W.reshape((1, *W.shape))
 
+    # Reshape W shape(1, kh, kw, c_prev, c_new)
+    W_reshaped = W[np.newaxis, ...]
+
+    # Perform convolution
     for i in range(oh):
         for j in range(ow):
             h_start = i * sh
             h_end = h_start + kh
             w_start = j * sw
             w_end = w_start + kw
+
+            # Extract patch and perform convolution
             # patch: (m, kh, kw, c, 1)
-            # kernels: (1, kh, kw, c, nc)
-            # output: (m, kh, kw, c, nc)
-            conv_layer[:, i, j, :] = activation(np.sum(
-                p_input[:, h_start:h_end, w_start:w_end,
-                        :, None] * W,
-                axis=(1, 2, 3)
-            ) + b)
+            # kernels: (1, kh, kw, c, c_new)
+            # output: (m, kh, kw, c, c_new)
+            patch = p_input[:, h_start:h_end, w_start:w_end, :, np.newaxis]
+            conv_layer[:, i, j, :] = activation(
+                np.sum(patch * W_reshaped, axis=(1, 2, 3)) + b
+            )
+
     return conv_layer
