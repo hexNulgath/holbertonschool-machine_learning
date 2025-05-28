@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""pool forward"""
 import numpy as np
 
 
