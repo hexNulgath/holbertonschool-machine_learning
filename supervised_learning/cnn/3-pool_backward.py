@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""pool_backprop"""
 import numpy as np
 
 
