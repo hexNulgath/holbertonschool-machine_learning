@@ -32,3 +32,34 @@ def pool_backward(dA, A_prev, kernel_shape, stride=(1, 1), mode='max'):
 
     Returns: partial derivatives with respect to the previous layer (dA_prev)
     """
+    m, h_new, w_new, c_new = dA.shape
+    kh, kw = kernel_shape
+    sh, sw = stride
+    dA_prev = np.zeros_like(A_prev)
+    for n in range(m):
+        for h in range(h_new):
+            for w in range(w_new):
+                for ch in range(c_new):
+                    h_start = h * sh
+                    h_end = h_start + kh
+                    w_start = w * sw
+                    w_end = w_start + kw
+
+                    if mode == 'max':
+                        # extract the current slice
+                        a_prev_slice = A_prev[n,
+                                              h_start:h_end, w_start:w_end, ch]
+                        # create a boolean mask to use only max value
+                        # compare max value to each value
+                        mask = (a_prev_slice == np.max(a_prev_slice))
+                        # use the gradient to affect only max value
+                        dA_prev[n, h_start:h_end, w_start:w_end,
+                                ch] += mask * dA[n, h, w, ch]
+                    elif mode == 'avg':
+                        # Compute the average gradient per pixel
+                        average = dA[n, h, w, ch] / (kh * kw)
+                        # Distribute equally
+                        dA_prev[n, h_start:h_end, w_start:w_end,
+                                ch] += np.ones((kh, kw)) * average
+
+    return dA_prev
