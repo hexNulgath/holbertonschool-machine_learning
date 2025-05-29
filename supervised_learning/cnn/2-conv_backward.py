@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""cov_backward.py"""
 import numpy as np
 
 
@@ -31,8 +32,9 @@ def conv_backward(dZ, A_prev, W, b, padding="same", stride=(1, 1)):
         pad_w = ((w_prev - 1) * sw + kw - w_prev) // 2 + 1
     else:
         pad_h, pad_w = 0, 0
-    padded_images = np.pad(A_prev, ((0, 0), (pad_h, pad_h), (pad_w, pad_w), (0, 0)),
-                           mode='constant')
+    padded_images = np.pad(
+        A_prev, ((0, 0), (pad_h, pad_h), (pad_w, pad_w), (0, 0)),
+        mode='constant')
     # Initialize gradients
     dA_prev = np.zeros_like(padded_images)
     dW = np.zeros_like(W)
@@ -48,9 +50,10 @@ def conv_backward(dZ, A_prev, W, b, padding="same", stride=(1, 1)):
                 w_end = w_start + kw
 
                 # Update gradients
-                dW[:, :, :, k] += np.sum(padded_images[:, h_start:h_end,
-                                                       w_start:w_end, :] *
-                                         dZ[:, i, j, k, np.newaxis, np.newaxis, np.newaxis], axis=0)
+                dW[:, :, :, k] += np.sum(
+                    padded_images[:, h_start:h_end,
+                                  w_start:w_end, :] *
+                    dZ[:, i, j, k, np.newaxis, np.newaxis, np.newaxis], axis=0)
                 dA_prev[:, h_start:h_end, w_start:w_end, :] += (
                     W[:, :, :, k] * dZ[:, i, j, k,
                                        np.newaxis, np.newaxis, np.newaxis])
