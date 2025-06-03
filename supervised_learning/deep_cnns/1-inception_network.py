@@ -6,10 +6,10 @@ inception_block = __import__('0-inception_block').inception_block
 
 def inception_network():
     """
-    builds the inception network as described in Going Deeper with Convolutions (2014):
+    builds the inception network as described in
+    Going Deeper with Convolutions (2014):
 
     You can assume the input data will have shape (224, 224, 3)
-    All convolutions inside and outside the inception block should use a rectified linear activation (ReLU)
 
     Returns: the keras model
     """
