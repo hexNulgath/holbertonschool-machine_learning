@@ -23,7 +23,7 @@ def dense_block(X, nb_filters, growth_rate, layers):
     """
     concat = X
     for _ in range(layers):
-        # Bottleneck layer
+        # Bottleneck layer 1x1 3x3
         X = K.layers.BatchNormalization(axis=3)(concat)
         X = K.layers.Activation('relu')(X)
         X = K.layers.Conv2D(
