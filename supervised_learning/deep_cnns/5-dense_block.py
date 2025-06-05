@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""dense_block module"""
 from tensorflow import keras as K
 
 
