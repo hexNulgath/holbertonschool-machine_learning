@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """transfer learning"""
 from tensorflow import keras as K
-import tensorflow as tf
 
 
 def preprocess_data(X, Y):
@@ -64,7 +63,7 @@ def train_model():
     (X_train, Y_train), (X_test, Y_test) = K.datasets.cifar10.load_data()
 
     # validation split
-    # Shuffle and split (80% train, 20% validation)
+    # Shuffle and split (85% train, 15% validation)
     val_size = int(0.15 * len(X_train))  # 15% for validation
 
     X_val, Y_val = X_train[:val_size], Y_train[:val_size]
