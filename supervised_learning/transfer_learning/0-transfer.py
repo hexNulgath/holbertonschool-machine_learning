@@ -32,7 +32,7 @@ def build_model():
     resize_layer = K.layers.Resizing(260, 260)(inputs)
 
     # Create base model from pre-trained model (excluding top layers)
-    base_model = K.applications.EfficientNetB2(
+    base_model = K.applications.EfficientNetV2S(
         include_top=False,
         weights="imagenet",
         input_shape=(260, 260, 3),
@@ -90,7 +90,7 @@ def train_model():
             'cifar10.h5',
             save_best_only=True,
             monitor='val_accuracy',
-            mode='avg',
+            mode='max',
         ),
         K.callbacks.EarlyStopping(
             monitor='val_accuracy',
@@ -99,25 +99,18 @@ def train_model():
         )
     ]
 
-    # Add data augmentation
-    datagen = K.preprocessing.image.ImageDataGenerator(
-        rotation_range=15,
-        width_shift_range=0.1,
-        height_shift_range=0.1,
-        horizontal_flip=True
-    )
-    datagen.fit(X_train_p)
     # Train the model
     model.fit(
-        datagen.flow(X_train_p, Y_train_p, batch_size=64),
+        X_train_p, Y_train_p,
+        batch_size=64,
         validation_data=(X_val_p, Y_val_p),
         epochs=20,
         callbacks=callbacks
     )
 
-    base_model = model.layers[1]  # Get the base model
+    base_model = model.layers[2]  # Get the base model
     base_model.trainable = True  # Unfreeze the base model
-    for layer in base_model.layers[:-10]:
+    for layer in base_model.layers[:-2]:
         layer.trainable = False
     fine_tune_optimizer = K.optimizers.Adam(1e-5)
     model.compile(
@@ -125,8 +118,9 @@ def train_model():
         loss='categorical_crossentropy',
         metrics=['accuracy']
     )
-    fine_tuning_history = model.fit(
-        datagen.flow(X_train_p, Y_train_p, batch_size=64),
+    model.fit(
+        X_train_p, Y_train_p,
+        batch_size=64,
         validation_data=(X_val_p, Y_val_p),
         epochs=10,
         callbacks=callbacks
