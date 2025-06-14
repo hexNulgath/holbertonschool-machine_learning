@@ -110,7 +110,7 @@ def train_model():
 
     base_model = model.layers[2]  # Get the base model
     base_model.trainable = True  # Unfreeze the base model
-    for layer in base_model.layers[:-2]:
+    for layer in base_model.layers[:-10]:
         layer.trainable = False
     fine_tune_optimizer = K.optimizers.Adam(1e-5)
     model.compile(
