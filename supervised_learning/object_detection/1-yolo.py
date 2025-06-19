@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Yolo class for loading a Darknet Keras model and its parameters."""
 from tensorflow import keras as K
+import numpy as np
 
 
 class Yolo:
@@ -46,40 +47,36 @@ class Yolo:
 
     def process_outputs(self, outputs, image_size):
         """
-        outputs is a list of numpy.ndarrays containing the predictions from the Darknet model for a single image:
-        Each output will have the shape (grid_height, grid_width, anchor_boxes, 4 + 1 + classes)
-            grid_height & grid_width => the height and width of the grid used for the output
-            anchor_boxes => the number of anchor boxes used
-            4 => (t_x, t_y, t_w, t_h)
-            1 => box_confidence
-            classes => class probabilities for all classes
-        image_size is a numpy.ndarray containing the image’s original size [image_height, image_width]
+        Process Darknet model outputs and convert them to
+        interpretable bounding boxes.
 
-        Returns a tuple of (boxes, box_confidences, box_class_probs):
-            boxes: a list of numpy.ndarrays of shape (grid_height, grid_width, anchor_boxes, 4) containing the processed boundary boxes for each output, respectively:
-            4 => (x1, y1, x2, y2)
-            (x1, y1, x2, y2) should represent the boundary box relative to original image
-            box_confidences: a list of numpy.ndarrays of shape (grid_height, grid_width, anchor_boxes, 1) containing the box confidences for each output, respectively
-            box_class_probs: a list of numpy.ndarrays of shape (grid_height, grid_width, anchor_boxes, classes) containing the box’s class probabilities for each output, respectively
+        Args:
+            outputs: List of numpy.ndarrays containing predictions from Darknet
+            image_size: Original image size [height, width]
+
+        Returns:
+            Tuple of (boxes, box_confidences, box_class_probs)
         """
         boxes = []
         box_confidences = []
         box_class_probs = []
 
         for output in outputs:
-            # Extract the dimensions of the output
-            box_xy = output[..., :2]
-            box_wh = output[..., 2:4]
-            box_confidence = output[..., 4:5]
-            class_probs = output[..., 5:]
+            # Extract components from output tensor
+            box_xy = output[..., :2]  # Center coordinates (t_x, t_y)
+            box_wh = output[..., 2:4]  # Width/height (t_w, t_h)
+            box_confidence = output[..., 4:5]  # Objectness score
+            class_probs = output[..., 5:]  # Class probabilities
 
-            # Calculate the center of the boxes
+            # Convert from grid coordinates to image coordinates
             box_x1y1 = (box_xy - (box_wh / 2)) * [image_size[1], image_size[0]]
             box_x2y2 = (box_xy + (box_wh / 2)) * [image_size[1], image_size[0]]
 
-            # Create the final boxes
-            boxes.append(K.concatenate([box_x1y1, box_x2y2], axis=-1))
-            box_confidences.append(box_confidence)
-            box_class_probs.append(class_probs)
-
+            # Combine coordinates into [x1, y1, x2, y2] format
+            box = np.concatenate([box_x1y1, box_x2y2], axis=-1)
+            # Append to results
+            boxes.append(box)
+            # Apply sigmoid
+            box_confidences.append(1 / (1 + np.exp(-box_confidence)))
+            box_class_probs.append(1 / (1 + np.exp(-class_probs)))
         return boxes, box_confidences, box_class_probs
