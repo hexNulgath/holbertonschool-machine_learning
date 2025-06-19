@@ -63,12 +63,12 @@ class Yolo:
 
         for output in outputs:
             # Extract components from output tensor
-            box_xywh = output[:4]  # box
+            box_xywh = output[..., :4]  # box
             box_confidence = output[..., 4:5]  # Objectness score
             class_probs = output[..., 5:]  # Class probabilities
 
             # Convert from grid coordinates to image coordinates
-            x, y, w, h = box_xywh
+            x, y, w, h = np.split(box_xywh, 4, axis=-1)
             x1 = x - w / 2
             y1 = y - h / 2
             x2 = x + w / 2
@@ -79,7 +79,11 @@ class Yolo:
             box = np.concatenate([x1, y1, x2, y2], axis=-1)
             # Append to results
             boxes.append(box)
-            # Apply sigmoid
-            box_confidences.append(1 / (1 + np.exp(-box_confidence)))
-            box_class_probs.append(1 / (1 + np.exp(-class_probs)))
+            box_confidences.append(self.sigmoid(box_confidence))
+            box_class_probs.append(self.sigmoid(class_probs))
+
         return boxes, box_confidences, box_class_probs
+
+    def sigmoid(self, x):
+        """Sigmoid activation function"""
+        return 1 / (1 + np.exp(-x))
