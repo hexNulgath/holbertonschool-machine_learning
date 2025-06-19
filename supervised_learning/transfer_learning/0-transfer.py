@@ -87,7 +87,7 @@ def train_model():
     # Add callbacks
     callbacks = [
         K.callbacks.ModelCheckpoint(
-            'cifar10.h5',
+            'cifar1.h5',
             save_best_only=True,
             monitor='val_accuracy',
             mode='max',
@@ -104,7 +104,7 @@ def train_model():
         X_train_p, Y_train_p,
         batch_size=64,
         validation_data=(X_val_p, Y_val_p),
-        epochs=20,
+        epochs=60,
         callbacks=callbacks
     )
 
@@ -122,12 +122,12 @@ def train_model():
         X_train_p, Y_train_p,
         batch_size=64,
         validation_data=(X_val_p, Y_val_p),
-        epochs=10,
+        epochs=30,
         callbacks=callbacks
     )
 
     # Save the model
-    model.save(filepath='cifar10.h5', save_format='h5')
+    model.save(filepath='cifar1.h5', save_format='h5')
 
     # Evaluate on test set
     _, test_acc = model.evaluate(
