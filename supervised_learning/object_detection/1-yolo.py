@@ -37,7 +37,6 @@ class Yolo:
         self.anchors = anchors
         _, self.input_width, self.input_height, _ = self.model.input.shape
 
-
     @staticmethod
     def load_classes(classes_path):
         """
@@ -52,7 +51,8 @@ class Yolo:
         Process Darknet model outputs with deterministic operations.
         Args:
             outputs: List of numpy.ndarrays containing predictions from Darknet
-                    Each output has shape (grid_height, grid_width, anchor_boxes, 4 + 1 + classes)
+                    Each output has shape (grid_height, grid_width,
+                                            anchor_boxes, 4 + 1 + classes)
             image_size: Original image size [height, width]
         Returns:
             Tuple of (boxes, box_confidences, box_class_probs)
@@ -65,35 +65,35 @@ class Yolo:
         for i, output in enumerate(outputs):
             # Get grid dimensions
             grid_height, grid_width, num_anchors, _ = output.shape
-            
-            # Create grid of cell indices with proper dimensions (grid_height, grid_width, 1, 1)
+
+            # Create grid of cell indices with proper dimensions
             grid_y = np.arange(grid_height).reshape(grid_height, 1, 1, 1)
             grid_x = np.arange(grid_width).reshape(1, grid_width, 1, 1)
-            
+
             # Extract predictions
             tx = output[..., 0:1]  # (grid_h, grid_w, num_anchors, 1)
             ty = output[..., 1:2]  # (grid_h, grid_w, num_anchors, 1)
             tw = output[..., 2:3]  # (grid_h, grid_w, num_anchors, 1)
             th = output[..., 3:4]  # (grid_h, grid_w, num_anchors, 1)
-            box_confidence = output[..., 4:5]  # (grid_h, grid_w, num_anchors, 1)
-            class_probs = output[..., 5:]  # (grid_h, grid_w, num_anchors, num_classes)
-            
-            # Get anchor dimensions for this output layer (1, 1, num_anchors, 1)
+            box_confidence = output[..., 4:5]
+            class_probs = output[..., 5:]
+
+            # Get anchor dimensions for this output layer
             anchor_w = self.anchors[i, :, 0].reshape(1, 1, num_anchors, 1)
             anchor_h = self.anchors[i, :, 1].reshape(1, 1, num_anchors, 1)
-            
+
             # Calculate bounding box coordinates with proper broadcasting
             bx = (self.sigmoid(tx) + grid_x) / grid_width
             by = (self.sigmoid(ty) + grid_y) / grid_height
             bw = (np.exp(tw) * anchor_w) / self.input_width
             bh = (np.exp(th) * anchor_h) / self.input_height
-            
+
             # Convert to image coordinates
             x1 = (bx - bw / 2) * image_width
             y1 = (by - bh / 2) * image_height
             x2 = (bx + bw / 2) * image_width
             y2 = (by + bh / 2) * image_height
-            
+
             box = np.concatenate((x1, y1, x2, y2), axis=-1)
             # Apply sigmoid to confidence and class probabilities
             boxes.append(box)
