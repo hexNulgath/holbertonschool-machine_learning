@@ -46,6 +46,7 @@ class Yolo:
         with open(classes_path, 'r') as f:
             classes = [line.strip() for line in f if line.strip()]
         return classes
+
     def process_outputs(self, outputs, image_size):
         """
         Process Darknet model outputs with deterministic operations.
@@ -93,9 +94,7 @@ class Yolo:
             x2 = (bx + bw / 2) * image_width
             y2 = (by + bh / 2) * image_height
             
-            # Stack coordinates into [x1, y1, x2, y2] format
-            box = np.stack([x1, y1, x2, y2], axis=-1)
-            
+            box = np.concatenate((x1, y1, x2, y2), axis=-1)
             # Apply sigmoid to confidence and class probabilities
             boxes.append(box)
             box_confidences.append(self.sigmoid(box_confidence))
