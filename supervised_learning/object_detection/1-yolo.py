@@ -75,10 +75,11 @@ class Yolo:
             # Get the grid size
             grid_height, grid_width = output.shape[1:3]
             # grid cells coordinates for width and height
+            # Create a grid of coordinates for the output
             grid_x, grid_y = np.meshgrid(np.arange(grid_width),
                                  np.arange(grid_height))
 
-            # Add axis to match dimensions of t_x & t_y
+            # Add axis to match dimensions of x & y
             grid_x = np.expand_dims(grid_x, axis=-1)
             grid_y = np.expand_dims(grid_y, axis=-1)
 
