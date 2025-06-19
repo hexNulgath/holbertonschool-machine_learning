@@ -77,6 +77,8 @@ class Yolo:
 
             # Combine coordinates into [x1, y1, x2, y2] format
             box = np.concatenate([x1, y1, x2, y2], axis=-1)
+            box *= np.array([image_size[1], image_size[0], 
+                           image_size[1], image_size[0]])
             # Append to results
             boxes.append(box)
             box_confidences.append(self.sigmoid(box_confidence))
