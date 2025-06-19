@@ -46,38 +46,40 @@ class Yolo:
         return classes
 
     def process_outputs(self, outputs, image_size):
-        """
-        Process Darknet model outputs and convert them to
-        interpretable bounding boxes.
-
-        Args:
-            outputs: List of numpy.ndarrays containing predictions from Darknet
-            image_size: Original image size [height, width]
-
-        Returns:
-            Tuple of (boxes, box_confidences, box_class_probs)
-        """
         boxes = []
         box_confidences = []
         box_class_probs = []
-
-        for output in outputs:
-            # Extract components from output tensor
-            # Use sigmoid for xy coordinates and objectness score
-            box_xy = 1 / (1 + np.exp(-output[..., :2])) 
-            box_wh = output[..., 2:4]  # Width/height (t_w, t_h)
-            box_confidence = output[..., 4:5]  # Objectness score
-            class_probs = output[..., 5:]  # Class probabilities
-
-            # Convert from grid coordinates to image coordinates
-            box_x1y1 = (box_xy - (box_wh / 2)) * [image_size[1], image_size[0]]
-            box_x2y2 = (box_xy + (box_wh / 2)) * [image_size[1], image_size[0]]
-
-            # Combine coordinates into [x1, y1, x2, y2] format
+        
+        for i, output in enumerate(outputs):
+            # Apply sigmoid to tx, ty and confidence
+            box_xy = 1 / (1 + np.exp(-output[..., :2]))  # Sigmoid for center coordinates
+            box_wh = np.exp(output[..., 2:4])  # exp for width/height
+            
+            # Scale to grid size
+            grid_h, grid_w = output.shape[:2]
+            box_xy = (box_xy + self._get_grid_offset(grid_h, grid_w)) / [grid_w, grid_h]
+            
+            # Scale to image size
+            box_xy = box_xy * [image_size[1], image_size[0]]  # width, height
+            box_wh = box_wh * self.anchors[i]  # Multiply by anchor sizes
+            
+            # Convert to (x1,y1,x2,y2)
+            box_x1y1 = box_xy - (box_wh / 2)
+            box_x2y2 = box_xy + (box_wh / 2)
             box = np.concatenate([box_x1y1, box_x2y2], axis=-1)
-            # Append to results
+            
+            # Process confidence and class probs
+            box_confidence = 1 / (1 + np.exp(-output[..., 4:5]))
+            class_probs = 1 / (1 + np.exp(-output[..., 5:]))
+            
             boxes.append(box)
-            # Apply sigmoid
-            box_confidences.append(1 / (1 + np.exp(-box_confidence)))
-            box_class_probs.append(1 / (1 + np.exp(-class_probs)))
+            box_confidences.append(box_confidence)
+            box_class_probs.append(class_probs)
+        
         return boxes, box_confidences, box_class_probs
+
+    def _get_grid_offset(self, grid_h, grid_w):
+        """Create grid offset for cell indices"""
+        grid_x = np.arange(grid_w).reshape(1, -1, 1)
+        grid_y = np.arange(grid_h).reshape(-1, 1, 1)
+        return np.concatenate([grid_x, grid_y], axis=-1)
