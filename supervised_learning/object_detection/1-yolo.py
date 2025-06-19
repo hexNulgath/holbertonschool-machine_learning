@@ -35,6 +35,8 @@ class Yolo:
         self.class_t = class_t
         self.nms_t = nms_t
         self.anchors = anchors
+        _, self.input_width, self.input_height, _ = self.model.input.shape
+
 
     @staticmethod
     def load_classes(classes_path):
@@ -44,16 +46,13 @@ class Yolo:
         with open(classes_path, 'r') as f:
             classes = [line.strip() for line in f if line.strip()]
         return classes
-
     def process_outputs(self, outputs, image_size):
         """
-        Process Darknet model outputs and convert them to
-        interpretable bounding boxes.
-
+        Process Darknet model outputs with deterministic operations.
         Args:
             outputs: List of numpy.ndarrays containing predictions from Darknet
+                    Each output has shape (grid_height, grid_width, anchor_boxes, 4 + 1 + classes)
             image_size: Original image size [height, width]
-
         Returns:
             Tuple of (boxes, box_confidences, box_class_probs)
         """
@@ -63,45 +62,41 @@ class Yolo:
         image_height, image_width = image_size
 
         for i, output in enumerate(outputs):
-            # Convert from grid coordinates to image coordinates
-            x = output[..., 0:1]  # x center
-            y = output[..., 1:2]  # y center
-            w = output[..., 2:3]  # width
-            h = output[..., 3:4]  # height
-
-            # size of anchors
-            anchor_w = self.anchors[i, :, 0]
-            anchor_h = self.anchors[i, :, 1]
-            # Get the grid size
-            grid_height, grid_width = output.shape[1:3]
-            # grid cells coordinates for width and height
-            # Create a grid of coordinates for the output
-            grid_x, grid_y = np.meshgrid(np.arange(grid_width),
-                                 np.arange(grid_height))
-
-            # Add axis to match dimensions of x & y
-            grid_x = np.expand_dims(grid_x, axis=-1)
-            grid_y = np.expand_dims(grid_y, axis=-1)
-
-            # Calculate bounding box coordinates
-            box_x = (self.sigmoid(x) + grid_x) / grid_width
-            box_y = (self.sigmoid(y) + grid_y) / grid_height
-            # Calculate the center of the box (relative to the grid)
-            box_w = (np.exp(w) * anchor_w) / self.model.input.shape[1]
-            box_h = (np.exp(h) * anchor_h) / self.model.input.shape[2]
-
-            # Convert to coordinates of (x1, y1) and (x2, y2)
-            x1 = (box_x - box_w / 2) * image_width
-            y1 = (box_y - box_h / 2) * image_height
-            x2 = (box_x + box_w / 2) * image_width
-            y2 = (box_y + box_h / 2) * image_height
-
-            # Combine coordinates into [x1, y1, x2, y2] format
-            box = np.stack((x1, y1, x2, y2), axis=-1)
-            # Extract components from output tensor
-            box_confidence = output[..., 4:5]  # Objectness score
-            class_probs = output[..., 5:]  # Class probabilities
-            # Append to results
+            # Get grid dimensions
+            grid_height, grid_width, num_anchors, _ = output.shape
+            
+            # Create grid of cell indices with proper dimensions (grid_height, grid_width, 1, 1)
+            grid_y = np.arange(grid_height).reshape(grid_height, 1, 1, 1)
+            grid_x = np.arange(grid_width).reshape(1, grid_width, 1, 1)
+            
+            # Extract predictions
+            tx = output[..., 0:1]  # (grid_h, grid_w, num_anchors, 1)
+            ty = output[..., 1:2]  # (grid_h, grid_w, num_anchors, 1)
+            tw = output[..., 2:3]  # (grid_h, grid_w, num_anchors, 1)
+            th = output[..., 3:4]  # (grid_h, grid_w, num_anchors, 1)
+            box_confidence = output[..., 4:5]  # (grid_h, grid_w, num_anchors, 1)
+            class_probs = output[..., 5:]  # (grid_h, grid_w, num_anchors, num_classes)
+            
+            # Get anchor dimensions for this output layer (1, 1, num_anchors, 1)
+            anchor_w = self.anchors[i, :, 0].reshape(1, 1, num_anchors, 1)
+            anchor_h = self.anchors[i, :, 1].reshape(1, 1, num_anchors, 1)
+            
+            # Calculate bounding box coordinates with proper broadcasting
+            bx = (self.sigmoid(tx) + grid_x) / grid_width
+            by = (self.sigmoid(ty) + grid_y) / grid_height
+            bw = (np.exp(tw) * anchor_w) / self.input_width
+            bh = (np.exp(th) * anchor_h) / self.input_height
+            
+            # Convert to image coordinates
+            x1 = (bx - bw / 2) * image_width
+            y1 = (by - bh / 2) * image_height
+            x2 = (bx + bw / 2) * image_width
+            y2 = (by + bh / 2) * image_height
+            
+            # Stack coordinates into [x1, y1, x2, y2] format
+            box = np.stack([x1, y1, x2, y2], axis=-1)
+            
+            # Apply sigmoid to confidence and class probabilities
             boxes.append(box)
             box_confidences.append(self.sigmoid(box_confidence))
             box_class_probs.append(self.sigmoid(class_probs))
@@ -109,5 +104,5 @@ class Yolo:
         return boxes, box_confidences, box_class_probs
 
     def sigmoid(self, x):
-        """Sigmoid activation function"""
+        """Sigmoid activation function with deterministic implementation"""
         return 1 / (1 + np.exp(-x))
