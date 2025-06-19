@@ -69,10 +69,10 @@ class Yolo:
 
             # Convert from grid coordinates to image coordinates
             x, y, w, h = np.split(box_xywh, 4, axis=-1)
-            x1 = x - w / 2
-            x2 = y - h / 2
-            y1 = x + w / 2
-            y2 = y + h / 2
+            x1 = x + w / 2
+            x2 = y + h / 2
+            y1 = x - w / 2
+            y2 = y - h / 2
             
 
             # Combine coordinates into [x1, y1, x2, y2] format
