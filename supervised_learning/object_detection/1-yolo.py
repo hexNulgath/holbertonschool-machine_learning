@@ -63,20 +63,20 @@ class Yolo:
 
         for output in outputs:
             # Extract components from output tensor
-            box_xy = output[..., :2]  # Center coordinates (t_x, t_y)
-            # sigmoid activtion
-            box_xy = 1 / (1 + np.exp(-box_xy))
-
-            box_wh = output[..., 2:4]  # Width/height (t_w, t_h)
+            box_xywh = output[:4]  # box
             box_confidence = output[..., 4:5]  # Objectness score
             class_probs = output[..., 5:]  # Class probabilities
 
             # Convert from grid coordinates to image coordinates
-            box_x1y1 = (box_xy - (box_wh / 2)) * [image_size[1], image_size[0]]
-            box_x2y2 = (box_xy + (box_wh / 2)) * [image_size[1], image_size[0]]
+            x, y, w, h = box_xywh
+            x1 = x - w / 2
+            y1 = y - h / 2
+            x2 = x + w / 2
+            y2 = y + h / 2
+            
 
             # Combine coordinates into [x1, y1, x2, y2] format
-            box = np.concatenate([box_x1y1, box_x2y2], axis=-1)
+            box = np.concatenate([x1, y1, x2, y2], axis=-1)
             # Append to results
             boxes.append(box)
             # Apply sigmoid
