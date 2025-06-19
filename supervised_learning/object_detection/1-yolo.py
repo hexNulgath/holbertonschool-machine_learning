@@ -97,7 +97,7 @@ class Yolo:
             y2 = (box_y + box_h / 2) * image_height
 
             # Combine coordinates into [x1, y1, x2, y2] format
-            box = np.concatenate([x1, y1, x2, y2], axis=-1)
+            box = np.stack((x1, y1, x2, y2), axis=-1)
             # Extract components from output tensor
             box_confidence = output[..., 4:5]  # Objectness score
             class_probs = output[..., 5:]  # Class probabilities
