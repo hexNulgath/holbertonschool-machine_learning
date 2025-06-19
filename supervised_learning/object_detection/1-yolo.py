@@ -64,6 +64,8 @@ class Yolo:
         for output in outputs:
             # Extract components from output tensor
             box_xy = output[..., :2]  # Center coordinates (t_x, t_y)
+            # Normalize center coordinates to [0, 1] range
+            box_xy = (box_xy + 0.5) * [image_size[1], image_size[0]]
             box_wh = output[..., 2:4]  # Width/height (t_w, t_h)
             box_confidence = output[..., 4:5]  # Objectness score
             class_probs = output[..., 5:]  # Class probabilities
