@@ -4,7 +4,7 @@ from tensorflow import keras as K
 import numpy as np
 import tensorflow as tf
 import os
-
+import cv2
 
 class Yolo:
     """
@@ -229,13 +229,13 @@ class Yolo:
         """
         images = []
         image_paths = []
-
+        
         for filename in os.listdir(folder_path):
             if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp')):
                 image_path = os.path.join(folder_path, filename)
-                image = K.preprocessing.image.load_img(image_path)
-                image = K.preprocessing.image.img_to_array(image)
-                images.append(image)
-                image_paths.append(image_path)
-
+                image = cv2.imread(image_path)
+                if image is not None:  # Check if OpenCV loaded it correctly
+                    images.append(image)
+                    image_paths.append(image_path)
+        
         return images, image_paths
