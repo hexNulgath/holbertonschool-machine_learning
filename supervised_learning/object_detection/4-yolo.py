@@ -6,6 +6,7 @@ import tensorflow as tf
 import os
 import cv2
 
+
 class Yolo:
     """
     Yolo class for loading a Darknet Keras model and its associated parameters.
@@ -229,7 +230,7 @@ class Yolo:
         """
         images = []
         image_paths = []
-        
+
         for filename in os.listdir(folder_path):
             if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp')):
                 image_path = os.path.join(folder_path, filename)
@@ -237,5 +238,5 @@ class Yolo:
                 if image is not None:  # Check if OpenCV loaded it correctly
                     images.append(image)
                     image_paths.append(image_path)
-        
+
         return images, image_paths
