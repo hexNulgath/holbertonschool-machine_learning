@@ -285,8 +285,12 @@ class Yolo:
         """
         # Draw boxes and text on the image
         for box, cls, score in zip(boxes, box_classes, box_scores):
+            # get the coordinates of the box
             x1, y1, x2, y2 = box.astype(int)
+            # Draw the rectangle red
             cv2.rectangle(image, (x1, y1), (x2, y2), (255, 0, 0), 2)
+            # Draw the class name and score above the box
+            # use only 2 decimal places for the score
             text = f"{self.class_names[cls]}: {score:.2f}"
             cv2.putText(image, text, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX,
                         0.5, (0, 0, 255), 1, cv2.LINE_AA)
@@ -299,12 +303,11 @@ class Yolo:
 
         if key == ord('s'):
             # Create the detections directory if it doesn't exist
-            detections_dir = 'detections'
-            if not os.path.exists(detections_dir):
-                os.makedirs(detections_dir)
+            if not os.path.exists('detections'):
+                os.makedirs('detections')
             # Save the image
             save_path = os.path.join(
-                detections_dir, os.path.basename(file_name))
+                'detections', file_name)
             cv2.imwrite(save_path, image)
 
         # Close the window
