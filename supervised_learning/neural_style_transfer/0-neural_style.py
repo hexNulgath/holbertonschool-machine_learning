@@ -65,7 +65,9 @@ class NST:
         scale = 512 / max_dim
         new_h, new_w = int(h * scale), int(w * scale)
 
-        scaled_image = cv2.resize(
-            image, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
-        scaled_image = tf.convert_to_tensor(scaled_image / 255.0)
-        return scaled_image[np.newaxis, ...]
+        scaled_image = tf.image.resize(
+            image, (new_h, new_w), method='bilinear').numpy()
+
+        scaled_image = tf.convert_to_tensor(
+            scaled_image[np.newaxis, ...] / 255.0)
+        return scaled_image
