@@ -65,9 +65,7 @@ class NST:
         scale = 512 / max_dim
         new_size = (int(h * scale), int(w * scale))
 
-        scaled_image = scaled = tf.image.resize(
-            image[np.newaxis, ...] / 255.0,
-            new_size,
-            method='bilinear'
-        )
+        scaled_image = tf.image.resize(tf.convert_to_tensor(
+                 image, dtype=tf.float32)[tf.newaxis, ...] / 255.0,
+                 new_size)
         return scaled_image
