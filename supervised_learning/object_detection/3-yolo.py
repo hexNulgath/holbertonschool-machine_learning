@@ -203,8 +203,8 @@ class Yolo:
             indices = tf.image.non_max_suppression(
                 cls_boxes, cls_scores, max_output_size=50,
                 iou_threshold=self.nms_t
-            ).numpy()
-            # Get the selected boxes, classes, and scores
+            )
+            # Get the selected box, class, and score
             selected_boxes = cls_boxes[indices]
             selected_scores = cls_scores[indices]
             selected_classes = np.full(selected_scores.shape, cls)
