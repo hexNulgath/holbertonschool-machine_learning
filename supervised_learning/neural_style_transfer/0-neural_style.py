@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import numpy as np
-import cv2
 import tensorflow as tf
 """performs tasks for neural style transfer"""
 
