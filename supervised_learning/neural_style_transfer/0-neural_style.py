@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
+"""performs tasks for neural style transfer"""
 import numpy as np
 import tensorflow as tf
-"""performs tasks for neural style transfer"""
 
 
 class NST:
@@ -63,11 +63,11 @@ class NST:
         h, w, _ = image.shape
         max_dim = max(h, w)
         scale = 512 / max_dim
-        new_h, new_w = int(h * scale), int(w * scale)
+        new_size = (int(h * scale), int(w * scale))
 
-        scaled_image = tf.image.resize(
-            image, (new_h, new_w), method='bilinear').numpy()
-
-        scaled_image = tf.convert_to_tensor(
-            scaled_image[np.newaxis, ...] / 255.0)
+        scaled_image = scaled = tf.image.resize(
+            image[np.newaxis, ...] / 255.0,
+            new_size,
+            method='bilinear'
+        )
         return scaled_image
