@@ -73,8 +73,9 @@ class NST:
             new_size,
             method=tf.image.ResizeMethod.BICUBIC
         )
+        print(f"Resized image shape: {max(resized_image)}")
 
         # rescale to [0, 1]
-        scaled_image = resized_image / 255.0
+        scaled_image = tf.clip_by_value(resized_image / 255.0, 0.0, 1.0)
 
         return scaled_image
