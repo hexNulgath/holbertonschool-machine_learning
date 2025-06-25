@@ -64,9 +64,17 @@ class NST:
         max_dim = max(h, w)
         scale = 512 / max_dim
         new_size = (int(h * scale), int(w * scale))
-        scaled_image = tf.image.resize(
-            tf.convert_to_tensor(image)[tf.newaxis, ...] / 255.0,
+        # Convert to tensor and add batch dimension
+        image_tensor = tf.convert_to_tensor(image)[tf.newaxis, ...]
+
+        # Resize using bicubic interpolation (while in [0, 255] range)
+        resized_image = tf.image.resize(
+            image_tensor,
             new_size,
-            method=tf.image.ResizeMethod.BILINEAR,  # or NEAREST
-            antialias=True)
+            method=tf.image.ResizeMethod.BICUBIC
+        )
+
+        # rescale to [0, 1]
+        scaled_image = resized_image / 255.0
+
         return scaled_image
