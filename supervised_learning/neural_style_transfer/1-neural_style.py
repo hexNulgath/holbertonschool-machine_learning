@@ -88,10 +88,15 @@ class NST:
         # Load VGG19 without top layers and pretrained on ImageNet
         vgg = tf.keras.applications.VGG19(
             include_top=False,
-            weights='imagenet'
+            weights='imagenet',
         )
         # Freeze weights
         vgg.trainable = False
+
+        # Replace MaxPooling2D layers with AveragePooling2D
+        for layer in vgg.layers:
+            if isinstance(layer, tf.keras.layers.MaxPooling2D):
+                layer.__class__ = tf.keras.layers.AveragePooling2D
 
         # Get the desired layer outputs
         style_outputs = [
