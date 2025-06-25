@@ -66,6 +66,6 @@ class NST:
         new_size = (int(h * scale), int(w * scale))
 
         scaled_image = tf.image.resize(tf.convert_to_tensor(
-                 image, dtype=tf.float32)[tf.newaxis, ...] / 255.0,
+                 image)[tf.newaxis, ...] / 255.0,
                  new_size)
         return scaled_image
