@@ -179,6 +179,5 @@ class NST:
             raise TypeError(f"content_output must be a tensor of shape {s}")
         if len(content_output.shape) != len(self.content_feature.shape):
             raise TypeError(f"content_output must be a tensor of shape {s}")
-            raise TypeError(f"content_output must be a tensor of shape {s}")
         # Calculate the content cost
         return tf.reduce_mean(tf.square(content_output - self.content_feature))
