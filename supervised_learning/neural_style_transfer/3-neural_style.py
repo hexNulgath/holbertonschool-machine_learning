@@ -128,6 +128,7 @@ class NST:
 
         # Calculate gram matrix
         gram = tf.matmul(features, features, transpose_a=True)
+        gram = tf.expand_dims(gram, axis=0)
 
         # Normalize by number of locations
         return gram / tf.cast(height * width, tf.float32)
