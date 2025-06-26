@@ -164,8 +164,10 @@ class NST:
             raise TypeError(
                 f"style_outputs must be a list with a length of {L}")
         if len(style_outputs) != L:
-            raise ValueError(
+            raise TypeError(
                 f"style_outputs must be a list with a length of {L}")
+            raise TypeError(
+                    f"style_outputs must be a list with a length of {L}")
         # Calculate the style cost for each layer
         style_cost = 0
         for target, output in zip(self.gram_style_features, style_outputs):
