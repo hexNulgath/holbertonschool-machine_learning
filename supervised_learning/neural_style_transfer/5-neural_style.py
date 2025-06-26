@@ -159,15 +159,15 @@ class NST:
 
     def style_cost(self, style_outputs):
         """Calculates the style cost for all layers"""
-        l = len(self.style_layers)
-        if not isinstance(style_outputs, (list, tuple)):
+        L = len(self.style_layers)
+        if not isinstance(style_outputs, list):
             raise TypeError(
-                f"style_outputs must be a list with a length of {l}")
-        if l != len(self.gram_style_features):
+                f"style_outputs must be a list with a length of {L}")
+        if L != len(self.style_layers):
             raise ValueError(
-                f"style_outputs must be a list with a length of {l}")
+                f"style_outputs must be a list with a length of {L}")
         # Calculate the style cost for each layer
         style_cost = 0
         for target, output in zip(self.gram_style_features, style_outputs):
             style_cost += self.layer_style_cost(output, target)
-        return style_cost / l
+        return style_cost / L
