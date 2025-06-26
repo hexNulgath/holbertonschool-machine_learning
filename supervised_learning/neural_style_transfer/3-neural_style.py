@@ -140,10 +140,10 @@ class NST:
         style_image = tf.keras.applications.vgg19.preprocess_input(
             self.style_image * 255)
         # Get the style features and content features
-        style_outputs = self.model(style_image)
-        content_outputs = self.model(content_image)
-        # Calculate the gram matrices for the style features
+        # For style image outputs
+        content_output, *style_outputs = self.model(style_image)
         self.gram_style_features = [self.gram_matrix(style_feature)
-                                    for style_feature in style_outputs[1:]]
-        # Get the content feature
-        self.content_feature = content_outputs[0]
+                                for style_feature in style_outputs]
+
+        # For content image outputs
+        self.content_feature = self.model(content_image)[0]
