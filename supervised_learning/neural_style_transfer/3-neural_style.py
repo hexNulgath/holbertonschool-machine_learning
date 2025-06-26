@@ -115,23 +115,20 @@ class NST:
 
     @staticmethod
     def gram_matrix(input_layer):
-        """Calculates gram matrices in a more efficient way"""
+        """
+        calculate gram matrices
+        """
         if not isinstance(input_layer, (tf.Tensor, tf.Variable)):
             raise TypeError("input_layer must be a tensor of rank 4")
         if len(input_layer.shape) != 4:
             raise TypeError("input_layer must be a tensor of rank 4")
-
-        # Get dimensions
-        _, height, width, channels = tf.unstack(tf.shape(input_layer))
-        # Reshape to 2D matrix
-        features = tf.reshape(input_layer, [-1, channels])
-
-        # Calculate gram matrix
-        gram = tf.matmul(features, features, transpose_a=True)
-        gram = tf.expand_dims(gram, axis=0)
-
-        # Normalize by number of locations
-        return gram / tf.cast(height * width, tf.float32)
+        # Unroll the input layer
+        input_layer = tf.reshape(input_layer, [-1, input_layer.shape[-1]])
+        # Calculate the Gram matrix
+        gram = tf.matmul(input_layer, input_layer, transpose_a=True)
+        # Normalize by the number of elements in the batch
+        gram = tf.expand_dims(gram, axis=0)  # Add batch dimension
+        return gram / tf.cast(tf.shape(input_layer)[0], tf.float32)
 
     def generate_features(self):
         """Extracts the features used to calculate neural style cost"""
