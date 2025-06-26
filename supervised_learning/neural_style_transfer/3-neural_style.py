@@ -115,29 +115,36 @@ class NST:
 
     @staticmethod
     def gram_matrix(input_layer):
-        """Calculates gram matrices without unnecessary normalization"""
+        """Calculates gram matrices in a more efficient way"""
         if not isinstance(input_layer, (tf.Tensor, tf.Variable)):
             raise TypeError("input_layer must be a tensor of rank 4")
         if len(input_layer.shape) != 4:
             raise TypeError("input_layer must be a tensor of rank 4")
 
-        # Reshape to 2D matrix (flatten spatial dimensions)
-        features = tf.reshape(input_layer, [-1, tf.shape(input_layer)[-1]])
+        # Get dimensions
+        _, height, width, channels = tf.unstack(tf.shape(input_layer))
+    
+        # Reshape to 2D matrix
+        features = tf.reshape(input_layer, [-1, channels])
 
-        # Calculate gram matrix (un-normalized)
+        # Calculate gram matrix
         gram = tf.matmul(features, features, transpose_a=True)
 
-        # Return raw gram matrix without normalization
-        return gram
+        # Normalize by number of locations
+        return gram / tf.cast(height * width, tf.float32)
 
     def generate_features(self):
         """Extracts the features used to calculate neural style cost"""
+        # Preprocess the images
+        content_image = tf.keras.applications.vgg19.preprocess_input(
+            self.content_image * 255)
+        style_image = tf.keras.applications.vgg19.preprocess_input(
+            self.style_image * 255)
+        # Get the style features and content features
+        style_outputs = self.model(style_image)
+        content_outputs = self.model(content_image)
+        # Calculate the gram matrices for the style features
+        self.gram_style_features = [self.gram_matrix(style_feature)
+                                    for style_feature in style_outputs[:-1]]
         # Get the content feature
-        self.content_feature = self.model(
-            self.content_image)[0]
-        # Get the style features and their gram matrices
-        style_outputs = self.model(self.style_image)
-        self.style_features = style_outputs[1:]
-        self.gram_style_features = [
-            self.gram_matrix(feature) for feature in self.style_features
-        ]
+        self.content_feature = content_outputs[-1]
