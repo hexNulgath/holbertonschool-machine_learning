@@ -91,7 +91,7 @@ class NST:
         """
         # Load VGG19 without top layers and pretrained on ImageNet
         vgg = tf.keras.applications.VGG19(include_top=False,
-                                               weights='imagenet')
+                                          weights='imagenet')
         # Replace MaxPooling2D layers with AveragePooling2D
         pooling_layers = {"MaxPooling2D": tf.keras.layers.AveragePooling2D}
         vgg.save("base_vgg")
@@ -133,7 +133,7 @@ class NST:
         # For style image outputs
         style_outputs = self.model(style_image)
         self.gram_style_features = [self.gram_matrix(style_feature)
-                                for style_feature in style_outputs[:-1]]
+                                    for style_feature in style_outputs[:-1]]
 
         # For content image outputs
         self.content_feature = self.model(content_image)[-1]
