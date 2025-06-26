@@ -163,7 +163,7 @@ class NST:
         if not isinstance(style_outputs, list):
             raise TypeError(
                 f"style_outputs must be a list with a length of {L}")
-        if L != len(self.style_layers):
+        if len(style_outputs) != L:
             raise ValueError(
                 f"style_outputs must be a list with a length of {L}")
         # Calculate the style cost for each layer
