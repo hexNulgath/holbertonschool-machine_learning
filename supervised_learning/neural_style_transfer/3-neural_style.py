@@ -90,28 +90,21 @@ class NST:
         creates the model used to calculate cost
         """
         # Load VGG19 without top layers and pretrained on ImageNet
-        vgg = tf.keras.applications.VGG19(
-            include_top=False,
-            weights='imagenet',
-        )
-        # Freeze weights
-        vgg.trainable = False
-
+        vgg = tf.keras.applications.VGG19(include_top=False,
+                                               weights='imagenet')
         # Replace MaxPooling2D layers with AveragePooling2D
-        for layer in vgg.layers:
-            if isinstance(layer, tf.keras.layers.MaxPooling2D):
-                layer.__class__ = tf.keras.layers.AveragePooling2D
-
+        pooling_layers = {"MaxPooling2D": tf.keras.layers.AveragePooling2D}
+        vgg.save("base_vgg")
+        # Reload the VGG model with the pooling layers swapped
+        vgg = tf.keras.models.load_model("base_vgg",
+                                         custom_objects=pooling_layers)
+        # Make sure that the model is non-trainable
+        vgg.trainable = False
         # Get the desired layer outputs
-        style_outputs = [
-            vgg.get_layer(name).output for name in self.style_layers]
-        content_output = vgg.get_layer(self.content_layer).output
-
-        # Create a model with multi-output (content + style layers)
-        self.model = tf.keras.Model(
-            inputs=vgg.input,
-            outputs=[content_output] + style_outputs
-        )
+        outputs = [vgg.get_layer(layer).output for layer in self.style_layers]
+        outputs.append(vgg.get_layer(self.content_layer).output)
+        # Create a model that returns the outputs
+        self.model = tf.keras.models.Model(inputs=vgg.input, outputs=outputs)
 
     @staticmethod
     def gram_matrix(input_layer):
@@ -138,9 +131,9 @@ class NST:
             self.style_image * 255)
         # Get the style features and content features
         # For style image outputs
-        content_output, *style_outputs = self.model(style_image)
+        style_outputs = self.model(style_image)
         self.gram_style_features = [self.gram_matrix(style_feature)
-                                for style_feature in style_outputs]
+                                for style_feature in style_outputs[:-1]]
 
         # For content image outputs
-        self.content_feature = self.model(content_image)[0]
+        self.content_feature = self.model(content_image)[-1]
