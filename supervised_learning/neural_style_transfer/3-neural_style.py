@@ -135,14 +135,9 @@ class NST:
 
     def generate_features(self):
         """Extracts the features used to calculate neural style cost"""
-        # Preprocess the images
-        content_image = tf.keras.applications.vgg19.preprocess_input(
-            self.content_image * 255)
-        style_image = tf.keras.applications.vgg19.preprocess_input(
-            self.style_image * 255)
         # Get the style features and content features
-        style_outputs = self.model(style_image)
-        content_outputs = self.model(content_image)
+        style_outputs = self.model(self.style_image)
+        content_outputs = self.model(self.content_image)
         # Calculate the gram matrices for the style features
         self.gram_style_features = [self.gram_matrix(style_feature)
                                     for style_feature in style_outputs[:-1]]
