@@ -144,11 +144,13 @@ class NST:
             raise TypeError("style_output must be a tensor of rank 4")
         if len(style_output.shape) != 4:
             raise TypeError("style_output must be a tensor of rank 4")
-        c = style_output.shape[-1]
+        ch = style_output.shape[-1]
         if not isinstance(gram_target, (tf.Tensor, tf.Variable)):
-            raise TypeError("gram_target must be a tensor of shape [1, {c}, {c}]")
-        if len(gram_target.shape) != 3 or gram_target.shape != [1, c, c]:
-            raise TypeError("gram_target must be a tensor of shape [1, {c}, {c}]")
+            raise TypeError(
+                f"gram_target must be a tensor of shape [1, {ch}, {ch}]")
+        if len(gram_target.shape) != 3 or gram_target.shape != [1, ch, ch]:
+            raise TypeError(
+                f"gram_target must be a tensor of shape [1, {ch}, {ch}]")
 
         # Calculate the Gram matrix for the style output
         gram_style = self.gram_matrix(style_output)
