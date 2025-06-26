@@ -123,7 +123,6 @@ class NST:
 
         # Get dimensions
         _, height, width, channels = tf.unstack(tf.shape(input_layer))
-    
         # Reshape to 2D matrix
         features = tf.reshape(input_layer, [-1, channels])
 
