@@ -264,7 +264,7 @@ class NST:
         best_cost = float('inf')
         best_image = None
 
-        for i in range(iterations):
+        for i in range(iterations ):
             with tf.GradientTape() as tape:
                 grads, total, content, style = self.compute_grads(generated_image)
             optimizer.apply_gradients([(grads, generated_image)])
@@ -272,8 +272,8 @@ class NST:
             # Clip pixel values to maintain valid image range
             generated_image.assign(tf.clip_by_value(generated_image, 0, 1))
 
-            if step is not None and (i + 1) % step == 0 or i == 0:
-                print(f"Cost at iteration {i + 1}: "
+            if step is not None and i % step == 0:
+                print(f"Cost at iteration {i}: "
                     f"{total.numpy()}, content {content.numpy()}, "
                     f"style {style.numpy()}")
 
