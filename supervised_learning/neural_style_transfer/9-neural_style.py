@@ -268,7 +268,7 @@ class NST:
             optimizer.apply_gradients([(grads, generated_image)])
 
             # Clip pixel values to maintain valid image range
-            generated_image.assign(tf.clip_by_value(generated_image, 0.0, 255.0))
+            generated_image.assign(tf.clip_by_value(generated_image, 0.0, 1.0))
 
             if step is not None and (i + 1) % step == 0 or i == 0:
                 print(f"Cost at iteration {i + 1}: "
