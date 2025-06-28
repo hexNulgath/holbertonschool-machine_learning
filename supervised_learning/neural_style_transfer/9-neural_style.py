@@ -256,8 +256,8 @@ class NST:
         if beta2 < 0 or beta2 > 1:
             raise ValueError("beta2 must be in the range [0, 1]")
         # Initialize the generated image as a copy of the content image
-        generated_image = tf.Variable(self.content_image)
         optimizer = tf.keras.optimizers.Adam(learning_rate=lr, beta_1=beta1, beta_2=beta2)
+        generated_image = tf.Variable(self.content_image)
 
         best_cost = float('inf')
         best_image = None
@@ -270,7 +270,7 @@ class NST:
             # Clip pixel values to maintain valid image range
             generated_image.assign(tf.clip_by_value(generated_image, 0, 1))
 
-            if step is not None and i % step == 0:
+            if step is not None and (i + 1) % step == 0 or i == 0:
                 print(f"Cost at iteration {i + 1}: "
                     f"{total.numpy()}, content {content.numpy()}, "
                     f"style {style.numpy()}")
