@@ -278,5 +278,6 @@ class NST:
             if total.numpy() < best_cost:
                 best_cost = total.numpy()
                 best_image = generated_image
-
-        return best_image[0].numpy(), best_cost
+        # Removes the extra dimension from the image
+        best_image = best_image[0]
+        return best_image.numpy(), best_cost.numpy()
