@@ -115,13 +115,15 @@ class NST:
             raise TypeError("input_layer must be a tensor of rank 4")
         if len(input_layer.shape) != 4:
             raise TypeError("input_layer must be a tensor of rank 4")
+        # Get dimensions
+        batch, height, width, channels = tf.shape(input_layer)
         # Unroll the input layer
-        input_layer = tf.reshape(input_layer, [-1, input_layer.shape[-1]])
+        input_layer = tf.reshape(input_layer, [-1, channels])
         # Calculate the Gram matrix
         gram = tf.matmul(input_layer, input_layer, transpose_a=True)
-        # Normalize by the number of elements in the batch
+        # Normalize by the number of spatial locations (height * width)
         gram = tf.expand_dims(gram, axis=0)  # Add batch dimension
-        return gram / tf.cast(tf.shape(input_layer)[0], tf.float32)
+        return gram / tf.cast(height * width, tf.float32)
 
     def generate_features(self):
         """Extracts the features used to calculate neural style cost"""
