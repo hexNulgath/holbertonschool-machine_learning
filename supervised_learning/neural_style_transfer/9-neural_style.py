@@ -275,8 +275,8 @@ class NST:
                     f"{total.numpy()}, content {content.numpy()}, "
                     f"style {style.numpy()}")
 
-            if total.numpy() < best_cost:
-                best_cost = total.numpy()
+            if total < best_cost:
+                best_cost = total
                 best_image = generated_image
         # Removes the extra dimension from the image
         best_image = best_image[0]
