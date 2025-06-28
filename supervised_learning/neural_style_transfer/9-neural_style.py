@@ -263,7 +263,8 @@ class NST:
         best_image = None
 
         for i in range(iterations):
-            grads, total, content, style = self.compute_grads(generated_image)
+            with tf.GradientTape() as tape:
+                grads, total, content, style = self.compute_grads(generated_image)
             optimizer.apply_gradients([(grads, generated_image)])
 
             # Clip pixel values to maintain valid image range
