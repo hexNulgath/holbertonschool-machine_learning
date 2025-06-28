@@ -256,7 +256,7 @@ class NST:
         if beta2 < 0 or beta2 > 1:
             raise ValueError("beta2 must be in the range [0, 1]")
         # Initialize the generated image as a copy of the content image
-        optimizer = tf.keras.optimizers.Adam(learning_rate=lr, beta_1=beta1, beta_2=beta2)
+        optimizer = tf.optimizers.Adam(learning_rate=lr, beta_1=beta1, beta_2=beta2)
         generated_image = tf.Variable(self.content_image)
 
         best_cost = float('inf')
