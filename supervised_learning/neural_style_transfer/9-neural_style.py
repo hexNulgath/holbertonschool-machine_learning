@@ -260,15 +260,17 @@ class NST:
         if beta2 < 0 or beta2 > 1:
             raise ValueError("beta2 must be in the range [0, 1]")
         # Initialize the generated image as a copy of the content image
-        optimizer = tf.optimizers.Adam(learning_rate=lr, beta_1=beta1, beta_2=beta2)
+        optimizer = tf.optimizers.Adam(
+            learning_rate=lr, beta_1=beta1, beta_2=beta2)
         generated_image = tf.Variable(self.content_image)
 
         best_cost = float('inf')
         best_image = None
 
-        for i in range(iterations ):
+        for i in range(iterations):
             with tf.GradientTape() as tape:
-                grads, total, content, style = self.compute_grads(generated_image)
+                grads, total, content, style = self.compute_grads(
+                    generated_image)
             optimizer.apply_gradients([(grads, generated_image)])
 
             # Clip pixel values to maintain valid image range
@@ -276,8 +278,8 @@ class NST:
 
             if step is not None and i % step == 0:
                 print(f"Cost at iteration {i}: "
-                    f"{total.numpy()}, content {content.numpy()}, "
-                    f"style {style.numpy()}")
+                      f"{total.numpy()}, content {content.numpy()}, "
+                      f"style {style.numpy()}")
 
             if total.numpy() < best_cost:
                 best_cost = total.numpy()
