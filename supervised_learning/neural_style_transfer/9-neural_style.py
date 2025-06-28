@@ -94,9 +94,9 @@ class NST:
                                           weights='imagenet')
         # Replace MaxPooling2D layers with AveragePooling2D
         pooling_layers = {"MaxPooling2D": tf.keras.layers.AveragePooling2D}
-        vgg.save("base_vgg")
+        vgg.save("base_vgg.h5")
         # Reload the VGG model with the pooling layers swapped
-        vgg = tf.keras.models.load_model("base_vgg",
+        vgg = tf.keras.models.load_model("base_vgg.h5",
                                          custom_objects=pooling_layers)
         # Make sure that the model is non-trainable
         vgg.trainable = False
@@ -258,24 +258,25 @@ class NST:
         # Initialize the generated image as a copy of the content image
         generated_image = tf.Variable(self.content_image, dtype=tf.float32)
         optimizer = tf.keras.optimizers.Adam(learning_rate=lr, beta_1=beta1, beta_2=beta2)
-        
+
         best_cost = float('inf')
         best_image = None
 
         for i in range(iterations):
             grads, total, content, style = self.compute_grads(generated_image)
             optimizer.apply_gradients([(grads, generated_image)])
-            
+
             # Clip pixel values to maintain valid image range
             generated_image.assign(tf.clip_by_value(generated_image, 0.0, 255.0))
-            
+
             if step is not None and (i + 1) % step == 0 or i == 0:
                 print(f"Cost at iteration {i + 1}: "
                     f"{total.numpy()}, content {content.numpy()}, "
                     f"style {style.numpy()}")
-            
+
             if total.numpy() < best_cost:
                 best_cost = total.numpy()
                 best_image = generated_image.numpy().squeeze()
+        best_image = np.clip(best_image, 0, 1)
 
         return best_image, best_cost
