@@ -98,9 +98,9 @@ class NST:
                                           weights='imagenet')
         # Replace MaxPooling2D layers with AveragePooling2D
         pooling_layers = {"MaxPooling2D": tf.keras.layers.AveragePooling2D}
-        vgg.save("base_vgg.h5")
+        vgg.save("base_vgg")
         # Reload the VGG model with the pooling layers swapped
-        vgg = tf.keras.models.load_model("base_vgg.h5",
+        vgg = tf.keras.models.load_model("base_vgg",
                                          custom_objects=pooling_layers)
         # Make sure that the model is non-trainable
         vgg.trainable = False
