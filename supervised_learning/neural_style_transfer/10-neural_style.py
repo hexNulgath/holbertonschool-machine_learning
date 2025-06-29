@@ -305,11 +305,8 @@ class NST:
         """
         if not isinstance(generated_image, (tf.Tensor, tf.Variable)):
             raise TypeError("generated_image must be a tensor of rank 3 or 4")
-
-        # Ensure the input is rank-4 (add batch dimension if missing)
-        if len(generated_image.shape) == 3:
-            generated_image = tf.expand_dims(generated_image, axis=0)
-        elif len(generated_image.shape) != 4:
+        len_image = len(generated_image.shape)
+        if (len_image != 4 and len_image != 3):
             raise ValueError("generated_image must be a tensor of rank 3 or 4")
 
         # Calculate total variation loss
