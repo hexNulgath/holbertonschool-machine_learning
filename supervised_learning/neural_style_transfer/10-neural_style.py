@@ -51,6 +51,7 @@ class NST:
         self.content_image = self.scale_image(content_image)
         self.alpha = alpha
         self.beta = beta
+        self.var = var
         self.load_model()
         self.generate_features()
 
@@ -224,10 +225,10 @@ class NST:
         with tf.GradientTape() as tape:
             # Calculate the total cost
             tape.watch(generated_image)
-            total, content, style = self.total_cost(generated_image)
+            total, content, style, var = self.total_cost(generated_image)
         # Calculate the gradients
         grads = tape.gradient(total, generated_image)
-        return grads, total, content, style
+        return grads, total, content, style, var
 
     def generate_image(
             self, iterations=1000, step=None, lr=0.01, beta1=0.9, beta2=0.99):
