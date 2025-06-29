@@ -205,9 +205,10 @@ class NST:
         # Calculate the variational cost
         var_cost = self.variational_cost(generated_image)
         # Add the variational cost to the style cost
-        style_cost += self.beta * var_cost
+
         # Calculate the total cost
-        total_cost = self.alpha * content_cost + self.beta * style_cost
+        total_cost = (self.alpha * content_cost
+                      + self.beta * style_cost + self.var * var_cost)
         return total_cost, content_cost, style_cost, var_cost
 
     def compute_grads(self, generated_image):
@@ -302,7 +303,9 @@ class NST:
         Calculates the variational cost for the generated image
         """
         L = len(generated_image.shape)
-        if  L < 3 or L > 4:
+        if not isinstance(generated_image, (tf.Tensor, tf.Variable)):
+            raise TypeError("image must be a tensor of rank 3 or 4")
+        if L < 3 or L > 4:
             raise TypeError("image must be a tensor of rank 3 or 4")
         var_cost = tf.image.total_variation(generated_image)
         var_cost = tf.squeeze(var_cost)
