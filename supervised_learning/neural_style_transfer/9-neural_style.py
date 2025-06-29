@@ -116,14 +116,14 @@ class NST:
         if len(input_layer.shape) != 4:
             raise TypeError("input_layer must be a tensor of rank 4")
         # Get dimensions
-        batch, height, width, channels = tf.shape(input_layer)
+        batch, height, width, channels = input_layer.shape
         # Unroll the input layer
-        input_layer = tf.reshape(input_layer, [-1, channels])
+        features = tf.reshape(input_layer, [batch, height * width, channels])
         # Calculate the Gram matrix
-        gram = tf.matmul(input_layer, input_layer, transpose_a=True)
+        gram = tf.matmul(features, features, transpose_a=True)
         # Normalize by the number of spatial locations (height * width)
-        gram = tf.expand_dims(gram, axis=0)  # Add batch dimension
-        return gram / tf.cast(height * width, tf.float32)
+        gram = gram / tf.cast(height * width, tf.float32)
+        return gram
 
     def generate_features(self):
         """Extracts the features used to calculate neural style cost"""
@@ -268,22 +268,21 @@ class NST:
         best_image = None
 
         for i in range(iterations):
-            with tf.GradientTape() as tape:
-                grads, total, content, style = self.compute_grads(
-                    generated_image)
-            optimizer.apply_gradients([(grads, generated_image)])
-
-            # Clip pixel values to maintain valid image range
-            generated_image.assign(tf.clip_by_value(generated_image, 0, 1))
-
+            grads, total, content, style = self.compute_grads(generated_image)
+            
             if step is not None and i % step == 0:
                 print(f"Cost at iteration {i}: "
                       f"{total.numpy()}, content {content.numpy()}, "
                       f"style {style.numpy()}")
 
+            optimizer.apply_gradients([(grads, generated_image)])
+
+            # Clip pixel values to maintain valid image range
+            generated_image.assign(tf.clip_by_value(generated_image, 0, 1))
+
             if total.numpy() < best_cost:
                 best_cost = total.numpy()
-                best_image = generated_image
+                best_image = tf.Variable(generated_image)
         # Removes the extra dimension from the image
         best_image = best_image[0]
         best_image.assign(tf.clip_by_value(best_image, 0, 1))
