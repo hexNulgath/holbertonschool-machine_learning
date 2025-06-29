@@ -275,8 +275,9 @@ class NST:
         best_image = None
 
         for i in range(iterations):
-            grads, total, content, style, var = self.compute_grads(generated_image)
-            
+            grads, total, content, style, var = self.compute_grads(
+                generated_image)
+
             if step is not None and i % step == 0:
                 print(f"Cost at iteration {i}: "
                       f"{total.numpy()}, content {content.numpy()}, "
