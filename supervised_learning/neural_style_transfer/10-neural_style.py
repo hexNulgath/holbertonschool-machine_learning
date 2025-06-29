@@ -304,10 +304,10 @@ class NST:
         Calculates the variational cost for the generated image
         """
         if not isinstance(generated_image, (tf.Tensor, tf.Variable)):
-            raise TypeError("generated_image must be a tensor of rank 3 or 4")
+            raise TypeError("image must be a tensor of rank 3 or 4")
         len_image = len(generated_image.shape)
         if (len_image != 4 and len_image != 3):
-            raise TypeError("generated_image must be a tensor of rank 3 or 4")
+            raise TypeError("image must be a tensor of rank 3 or 4")
 
         # Calculate total variation loss
         var_cost = tf.image.total_variation(generated_image)
