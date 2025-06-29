@@ -301,6 +301,9 @@ class NST:
         """
         Calculates the variational cost for the generated image
         """
+        L = len(generated_image.shape)
+        if  L < 3 or L > 4:
+            raise TypeError("image must be a tensor of rank 3 or 4")
         var_cost = tf.image.total_variation(generated_image)
         var_cost = tf.squeeze(var_cost)
         return var_cost
