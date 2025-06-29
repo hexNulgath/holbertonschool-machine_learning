@@ -195,10 +195,10 @@ class NST:
             raise TypeError(f"generated_image must be a tensor of shape {s}")
         if generated_image.shape != s:
             raise TypeError(f"generated_image must be a tensor of shape {s}")
-        generated_image = tf.keras.applications.vgg19.preprocess_input(
+        processed_image = tf.keras.applications.vgg19.preprocess_input(
             generated_image * 255)
         # Get the outputs for the generated image
-        outputs = self.model(generated_image)
+        outputs = self.model(processed_image)
         # Calculate the style cost
         style_cost = self.style_cost(outputs[:-1])
         # Calculate the content cost
@@ -276,7 +276,7 @@ class NST:
         best_cost = float('inf')
         best_image = None
 
-        for i in range(iterations):
+        for i in range(iterations + 1):
             grads, total, content, style, var = self.compute_grads(
                 generated_image)
 
@@ -303,11 +303,17 @@ class NST:
         """
         Calculates the variational cost for the generated image
         """
-        L = len(generated_image.shape)
         if not isinstance(generated_image, (tf.Tensor, tf.Variable)):
-            raise TypeError("image must be a tensor of rank 3 or 4")
-        if L < 3 or L > 4:
-            raise TypeError("image must be a tensor of rank 3 or 4")
+            raise TypeError("generated_image must be a tensor of rank 3 or 4")
+
+        # Ensure the input is rank-4 (add batch dimension if missing)
+        if len(generated_image.shape) == 3:
+            generated_image = tf.expand_dims(generated_image, axis=0)
+        elif len(generated_image.shape) != 4:
+            raise ValueError("generated_image must be a tensor of rank 3 or 4")
+
+        # Calculate total variation loss
         var_cost = tf.image.total_variation(generated_image)
-        var_cost = tf.squeeze(var_cost)
-        return var_cost
+
+        # Return the scalar value (squeeze batch dimension)
+        return tf.squeeze(var_cost)
