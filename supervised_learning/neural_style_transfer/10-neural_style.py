@@ -301,11 +301,6 @@ class NST:
         """
         Calculates the variational cost for the generated image
         """
-        # Calculate the variational cost
-        h, w, _ = generated_image.shape
-        # Calculate the differences between adjacent pixels
-        diff_h = tf.reduce_sum(tf.abs(generated_image[:-1, :, :] -
-                                      generated_image[1:, :, :]))
-        diff_w = tf.reduce_sum(tf.abs(generated_image[:, :-1, :] -
-                                      generated_image[:, 1:, :]))
-        return (diff_h + diff_w) / (h * w)
+        var_cost = tf.image.total_variation(generated_image)
+        var_cost = tf.squeeze(var_cost)
+        return var_cost
