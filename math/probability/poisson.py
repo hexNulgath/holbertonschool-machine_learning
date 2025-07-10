@@ -9,6 +9,7 @@ class Poisson:
     Class to represent a Poisson distribution
     """
     e = 2.7182818285
+
     def __init__(self, data=None, lambtha=1.):
         """
         Initialize the Poisson distribution
