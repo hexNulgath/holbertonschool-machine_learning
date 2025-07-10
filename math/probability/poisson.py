@@ -2,7 +2,6 @@
 """
 Represents a poisson distribution
 """
-import numpy as np
 
 
 class Poisson:
@@ -19,7 +18,7 @@ class Poisson:
                 raise TypeError("data must be a list")
             if len(data) < 2:
                 raise ValueError("data must contain multiple values")
-            self.lambtha = float(np.mean(data))
+            self.lambtha = float(sum(data) / len(data))
         else:
             if lambtha <= 0:
                 raise ValueError("lambtha must be a positive value")
