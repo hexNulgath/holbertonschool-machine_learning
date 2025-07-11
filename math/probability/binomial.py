@@ -36,7 +36,7 @@ class Binomial:
         Calculates the value of the PMF for a given number of “successes”
         """
         if type(k) is not int:
-            int(k)
+            k = int(k)
         if k < 0 or k > self.n:
             return 0
         return (self.factorial(self.n) /
