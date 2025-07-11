@@ -22,7 +22,6 @@ class Binomial:
             self.n = int(n)
             self.p = float(p)
         else:
-            print("data:", data)
             if type(data) is not list:
                 raise TypeError("data must be a list")
             if len(data) < 2:
