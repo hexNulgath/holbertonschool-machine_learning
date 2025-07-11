@@ -55,3 +55,14 @@ class Normal:
         return (1 / (
             self.stddev * (2 * self.π) ** 0.5)
             ) * self.e ** (-0.5 * ((x - self.mean) / self.stddev) ** 2)
+
+    def cdf(self, x):
+        """
+        Calculates the value of the CDF for a given x value
+        """
+        z = self.z_score(x)
+        z = z / (2 ** 0.5)
+        erf = (2 / (self.π ** 0.5)) * (
+            z - z ** 3 / 3 + z ** 5 / 10 - z ** 7 / 42 + z ** 9 / 216)
+        erf_approx = max(-1, min(1, erf))
+        return 0.5 * (1 + erf_approx)
