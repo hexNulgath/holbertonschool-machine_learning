@@ -64,5 +64,4 @@ class Normal:
         z = z / (2 ** 0.5)
         erf = (2 / (self.π ** 0.5)) * (
             z - z ** 3 / 3 + z ** 5 / 10 - z ** 7 / 42 + z ** 9 / 216)
-        erf_approx = max(-1, min(1, erf))
-        return 0.5 * (1 + erf_approx)
+        return 0.5 * (1 + erf)
