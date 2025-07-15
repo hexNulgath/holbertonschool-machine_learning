@@ -21,12 +21,11 @@ def minor(matrix):
     for i in range(n):
         minor_row = []
         for j in range(n):
-            submatrix = [row[:j] + row[j+1:] for row in matrix[:i] + matrix[i+1:]]
-            if len(submatrix) == 1:
-                minor_row.append(submatrix[0][0])
-            elif len(submatrix) == 2:
-                minor_row.append(submatrix[0][0] * submatrix[1][1] - submatrix[0][1] * submatrix[1][0])
-            else:
-                minor_row.append(determinant(matrix))
+            # Create a submatrix by excluding the i-th row and j-th column
+            submatrix = [
+                [matrix[x][y] for y in range(n) if y != j]
+                for x in range(n) if x != i
+            ]
+            minor_row.append(determinant(submatrix))
         minors.append(minor_row)
     return minors
