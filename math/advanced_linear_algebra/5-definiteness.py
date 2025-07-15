@@ -13,7 +13,6 @@ def definiteness(matrix):
         raise TypeError("matrix must be a numpy.ndarray")
     if not matrix.ndim == 2 or matrix.shape[0] != matrix.shape[1]:
         return None
-    #matrix is symetric
     if not np.allclose(matrix, matrix.T):
         return None
     eigenvalues = np.linalg.eigvals(matrix)
