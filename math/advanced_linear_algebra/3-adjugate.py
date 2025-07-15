@@ -4,6 +4,7 @@
 """
 cofactor = __import__('2-cofactor').cofactor
 
+
 def adjugate(matrix):
     """
     calculates the adjugate matrix of a matrix
