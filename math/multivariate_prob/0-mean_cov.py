@@ -18,9 +18,10 @@ def mean_cov(X):
     """
     if not isinstance(X, np.ndarray) or X.ndim != 2:
         raise TypeError("X must be a 2D numpy.ndarray")
-    if X.shape[0] < 2:
+    n = X.shape[0]
+    if n < 2:
         raise ValueError("X must contain multiple data points")
     mean = np.mean(X, axis=0, keepdims=True)
     deviations = X - mean
-    cov = np.dot(deviations.T, deviations) / (X.shape[0] - 1)
+    cov = np.dot(deviations.T, deviations) / (n - 1)
     return mean, cov
