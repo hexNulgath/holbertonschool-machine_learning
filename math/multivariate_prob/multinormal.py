@@ -6,7 +6,9 @@ represents a Multivariate Normal distribution
 
 
 class MultiNormal:
-
+    """
+    Class representing a Multivariate Normal distribution
+    """
     def __init__(self, data):
         """
         data is a numpy.ndarray of shape (d, n) containing the data set:
