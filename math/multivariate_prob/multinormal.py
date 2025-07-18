@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-import numpy as np
 """
 represents a Multivariate Normal distribution
 """
+import numpy as np
 
 
 class MultiNormal:
