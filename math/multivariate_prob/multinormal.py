@@ -17,13 +17,8 @@ class MultiNormal:
             raise TypeError("data must be a 2D numpy.ndarray")
         if data.shape[1] < 2:
             raise ValueError("data must contain multiple data points")
+        n = data.shape[0]
 
-        self.mean, self.cov = self.mean_cov(data)
-
-    @staticmethod
-    def mean_cov(data):
-        """
-        calculates the mean and covariance of the data set
-        """
-        mean_cov = __import__('0-mean_cov').mean_cov
-        return mean_cov(data)
+        self.mean = np.mean(data, axis=1, keepdims=True)
+        deviations = data - self.mean
+        self.cov = deviations @ deviations.T / (data.shape[1] - 1)
