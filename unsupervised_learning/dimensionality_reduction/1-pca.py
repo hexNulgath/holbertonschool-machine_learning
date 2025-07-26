@@ -8,10 +8,8 @@ def pca(X, ndim):
     performs PCA on a dataset
     """
     X_centered = X - np.mean(X, axis=0)
-    SVD = np.linalg.svd(X_centered, full_matrices=False)
-    U = SVD[0]
-    S = SVD[1]
-    T = np.matmul(U, np.diag(S))
+    U, S, Vt = np.linalg.svd(X_centered, full_matrices=False)
+    T = np.dot(X_centered, Vt.T)
     if ndim < T.shape[1]:
         T = T[:, :ndim]
     return T
