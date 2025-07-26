@@ -9,7 +9,7 @@ def beta_cdf(p, a, b):
     return special.betainc(a, b, p)
 
 
-def posterior(x, n, P1, P2):
+def posterior(x, n, p1, p2):
     """
      calculates the posterior probability for the various
      hypothetical probabilities of developing severe side
@@ -22,12 +22,12 @@ def posterior(x, n, P1, P2):
             "x must be an integer that is greater than or equal to 0")
     if x > n:
         raise ValueError("x cannot be greater than n")
-    if not isinstance(P1, float) or P1 < 0 or P1 > 1:
-        raise ValueError("P1 must be a float in the range [0, 1]")
-    if not isinstance(P2, float) or P2 < 0 or P2 > 1:
-        raise ValueError("P2 must be a float in the range [0, 1]")
-    if P2 <= P1:
-        raise ValueError("P2 must be greater than P1")
-    prob = beta_cdf(P2, x + 1, n - x + 1) - beta_cdf(P1, x + 1, n - x + 1)
+    if not isinstance(p1, float) or p1 < 0 or p1 > 1:
+        raise ValueError("p1 must be a float in the range [0, 1]")
+    if not isinstance(p2, float) or p2 < 0 or p2 > 1:
+        raise ValueError("p2 must be a float in the range [0, 1]")
+    if p2 <= p1:
+        raise ValueError("p2 must be greater than p1")
+    prob = beta_cdf(p2, x + 1, n - x + 1) - beta_cdf(p1, x + 1, n - x + 1)
 
     return prob
