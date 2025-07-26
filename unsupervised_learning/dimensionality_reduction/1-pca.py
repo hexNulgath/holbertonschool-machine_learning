@@ -14,4 +14,5 @@ def pca(X, ndim):
     T = np.dot(U, np.diag(S))
     if ndim < T.shape[1]:
         T = T[:, :ndim]
+    T[T == -0.0] = 0.0
     return T
