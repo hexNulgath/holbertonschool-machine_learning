@@ -3,9 +3,10 @@
 from scipy import special
 
 
-# Compute the CDF at p2 and p1, then take the difference
 def beta_cdf(p, a, b):
-    # Regularized incomplete Beta function (CDF of Beta distribution)
+    """
+    Computes the cumulative distribution function (CDF) of the Beta distribution
+    at a given point p with parameters a and b."""
     return special.betainc(a, b, p)
 
 
