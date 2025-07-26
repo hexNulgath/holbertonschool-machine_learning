@@ -5,7 +5,8 @@ from scipy import special
 
 def beta_cdf(p, a, b):
     """
-    Computes the cumulative distribution function (CDF) of the Beta distribution
+    Computes the cumulative distribution function
+    (CDF) of the Beta distribution
     at a given point p with parameters a and b."""
     return special.betainc(a, b, p)
 
