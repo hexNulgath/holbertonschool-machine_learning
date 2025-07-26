@@ -11,8 +11,7 @@ def pca(X, ndim):
     SVD = np.linalg.svd(X_centered, full_matrices=False)
     U = SVD[0]
     S = SVD[1]
-    T = np.dot(U, np.diag(S))
+    T = np.matmul(U, np.diag(S))
     if ndim < T.shape[1]:
         T = T[:, :ndim]
-    T[T == -0.0] = 0.0
     return T
