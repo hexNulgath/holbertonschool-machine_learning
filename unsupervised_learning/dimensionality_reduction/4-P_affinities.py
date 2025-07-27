@@ -6,15 +6,15 @@ import numpy as np
 P_init = __import__('2-P_init').P_init
 HP = __import__('3-entropy').HP
 
+
 def P_affinities(X, tol=1e-5, perplexity=30.0):
     """
-    Calculates the symmetric P affinities of a data set for t-SNE
-    
-    Args:
+    Calculates the symmetric P affinities of a data set
+
         X: numpy.ndarray of shape (n, d) containing the dataset
         tol: maximum tolerance for Shannon entropy difference
         perplexity: desired perplexity for all distributions
-        
+
     Returns:
         P: numpy.ndarray of shape (n, n) containing symmetric P affinities
     """
@@ -25,7 +25,7 @@ def P_affinities(X, tol=1e-5, perplexity=30.0):
     for i in range(n):
         # Calculate Shannon entropy for the current row
         H, P[i, 1:] = HP(D[i, 1:], betas[i])
-        
+
         # Adjust beta until the entropy is within the tolerance
         for _ in range(100):
             if np.abs(H - target_H) > tol:
@@ -33,7 +33,7 @@ def P_affinities(X, tol=1e-5, perplexity=30.0):
                     betas[i] *= 0.5  # Decrease beta
                 else:
                     betas[i] *= 2.0  # Increase beta
-                
+
                 # Recalculate P affinities and entropy
                 P[i, 1:] = np.exp(-D[i, 1:] * betas[i])
                 P[i, 1:] /= np.sum(P[i, 1:])  # Normalize to sum to 1
