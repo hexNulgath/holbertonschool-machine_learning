@@ -27,16 +27,17 @@ def P_affinities(X, tol=1e-5, perplexity=30.0):
         H, P[i, 1:] = HP(D[i, 1:], betas[i])
         
         # Adjust beta until the entropy is within the tolerance
-        for _ in range(100) and np.abs(H - target_H) > tol:
-            if H < target_H:
-                betas[i] *= 0.5  # Decrease beta
-            else:
-                betas[i] *= 2.0  # Increase beta
-            
-            # Recalculate P affinities and entropy
-            P[i, 1:] = np.exp(-D[i, 1:] * betas[i])
-            P[i, 1:] /= np.sum(P[i, 1:])  # Normalize to sum to 1
-            H, _ = HP(D[i, 1:], betas[i])
+        for _ in range(100):
+            if np.abs(H - target_H) > tol:
+                if H < target_H:
+                    betas[i] *= 0.5  # Decrease beta
+                else:
+                    betas[i] *= 2.0  # Increase beta
+                
+                # Recalculate P affinities and entropy
+                P[i, 1:] = np.exp(-D[i, 1:] * betas[i])
+                P[i, 1:] /= np.sum(P[i, 1:])  # Normalize to sum to 1
+                H, _ = HP(D[i, 1:], betas[i])
         # Set P[i, 0] to 0 for symmetry
         P[i, 0] = 0.0
     # Make P symmetric
