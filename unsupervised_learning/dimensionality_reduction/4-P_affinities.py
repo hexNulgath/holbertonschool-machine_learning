@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-4-P_affinities.py
+Improved 4-P_affinities.py
 """
 import numpy as np
 P_init = __import__('2-P_init').P_init
@@ -10,75 +10,73 @@ HP = __import__('3-entropy').HP
 def P_affinities(X, tol=1e-5, perplexity=30.0):
     """
     Calculates the symmetric P affinities of a data set for t-SNE
-
-    Args:
-        X: numpy.ndarray of shape (n, d) containing the dataset
-        tol: maximum tolerance for Shannon entropy difference
-        perplexity: desired perplexity for all distributions
-
-    Returns:
-        P: numpy.ndarray of shape (n, n) containing symmetric P affinities
     """
-    # Initialize distance matrix, P matrix, betas, and entropy
-    D, P, beta, _ = P_init(X, perplexity)
+    D, P, betas, H = P_init(X, perplexity)
     n = X.shape[0]
-    log_perplexity = np.log(perplexity)
 
-    # Loop over all datapoints
+    # Convert betas to 1D array if it's 2D
+    if betas.ndim == 2:
+        betas = betas.flatten()
+
     for i in range(n):
-        # Compute all pairwise affinities except i-i
-        Di = D[i, np.concatenate((np.r_[0:i], np.r_[i+1:n]))]
+        # Get distances for current point (excluding self)
+        mask = np.ones(n, dtype=bool)
+        mask[i] = False
+        Di = D[i, mask]
 
-        # Binary search for sigma that results in desired perplexity
-        H, thisP = binary_search_perplexity(Di, beta[i], log_perplexity, tol)
+        # Perform binary search for this point
+        beta_i = binary_search_perplexity(Di, betas[i], H, tol)
 
-        # Fill in the row (except diagonal)
-        P[i, np.concatenate((np.r_[0:i], np.r_[i+1:n]))] = thisP
+        # Calculate probabilities
+        _, thisP = HP(Di, beta_i)
 
-    # Symmetrize P and normalize
-    P = (P + P.T) / (2 * n)
+        # Insert probabilities back into P matrix
+        P[i, mask] = thisP
 
-    # Ensure diagonal is zero and avoid numerical issues
+    # Make P symmetric
+    P = (P + P.T) / (2 * n)  # Normalize properly
+
+    # Ensure diagonal is zero and apply minimal numerical floor
+    P = np.maximum(P, np.finfo(P.dtype).eps)
     np.fill_diagonal(P, 0)
 
-    # Normalize again to ensure sum is 1
+    # Final normalization to ensure sum = 1
     P = P / np.sum(P)
 
     return P
 
 
-def binary_search_perplexity(D, beta, log_perplexity, tol=1e-5, max_iter=50):
-    """Helper function for binary search to find proper beta values"""
-    def Hbeta(D, beta):
-        P = np.exp(-D * beta)
-        sumP = np.sum(P)
-        H = np.log(sumP) + beta * np.sum(D * P) / sumP
-        P = P / sumP
-        return H, P
-
-    # Initialize search parameters
+def binary_search_perplexity(D, beta, target_H, tol=1e-5, max_iter=100):
+    """Binary search to find proper beta value that gives target entropy"""
     betamin = -np.inf
     betamax = np.inf
-    H, P = Hbeta(D, beta)
-    Hdiff = H - log_perplexity
+
+    H, _ = HP(D, beta)
+    Hdiff = H - target_H
     tries = 0
 
     while np.abs(Hdiff) > tol and tries < max_iter:
-        if Hdiff > 0:
-            betamin = beta.copy()
+        if Hdiff > 0:  # Entropy too high -> need higher beta
+            betamin = beta
             if betamax == np.inf:
                 beta *= 2
             else:
                 beta = (beta + betamax) / 2
-        else:
-            betamax = beta.copy()
+        else:  # Entropy too low -> need lower beta
+            betamax = beta
             if betamin == -np.inf:
                 beta /= 2
             else:
                 beta = (beta + betamin) / 2
 
-        H, P = Hbeta(D, beta)
-        Hdiff = H - log_perplexity
+        # Handle extreme cases
+        if beta > 1e100:
+            return 1e100
+        if beta < -1e100:
+            return -1e100
+
+        H, _ = HP(D, beta)
+        Hdiff = H - target_H
         tries += 1
 
-    return H, P
+    return beta
