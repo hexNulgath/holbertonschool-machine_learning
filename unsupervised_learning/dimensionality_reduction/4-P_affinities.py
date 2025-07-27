@@ -6,45 +6,81 @@ import numpy as np
 P_init = __import__('2-P_init').P_init
 HP = __import__('3-entropy').HP
 
-
 def P_affinities(X, tol=1e-5, perplexity=30.0):
     """
-    Calculates the symmetric P affinities of a data set
-
+    Calculates the symmetric P affinities of a data set for t-SNE
+    
+    Args:
         X: numpy.ndarray of shape (n, d) containing the dataset
         tol: maximum tolerance for Shannon entropy difference
         perplexity: desired perplexity for all distributions
-
+        
     Returns:
         P: numpy.ndarray of shape (n, n) containing symmetric P affinities
     """
     # Initialize distance matrix, P matrix, betas, and entropy
-    D, P, betas, _ = P_init(X, perplexity)
+    D, P, beta, _ = P_init(X, perplexity)
     n = X.shape[0]
-    target_H = np.log2(perplexity)  # Convert perplexity to target entropy
+    log_perplexity = np.log(perplexity)
+    
+    # Loop over all datapoints
     for i in range(n):
-        # Calculate Shannon entropy for the current row
-        H, P[i, 1:] = HP(D[i, 1:], betas[i])
-
-        # Adjust beta until the entropy is within the tolerance
-        for _ in range(100):
-            if np.abs(H - target_H) > tol:
-                if H < target_H:
-                    betas[i] *= 0.5  # Decrease beta
-                else:
-                    betas[i] *= 2.0  # Increase beta
-
-                # Recalculate P affinities and entropy
-                P[i, 1:] = np.exp(-D[i, 1:] * betas[i])
-                P[i, 1:] /= np.sum(P[i, 1:])  # Normalize to sum to 1
-                H, _ = HP(D[i, 1:], betas[i])
-        # Set P[i, 0] to 0 for symmetry
-        P[i, 0] = 0.0
-    # Make P symmetric
-    P = (P + P.T) / 2
-    # Set diagonal to 0
-    np.fill_diagonal(P, 0.0)
-    # Normalize P to sum to 1
-    P /= np.sum(P)
-
+        # Compute the Gaussian kernel and entropy for the current precision
+        betamin = -np.inf
+        betamax = np.inf
+        
+        # Compute all pairwise affinities except i-i
+        Di = D[i, np.concatenate((np.r_[0:i], np.r_[i+1:n]))]
+        
+        # Binary search for sigma that results in desired perplexity
+        H, thisP = binary_search_perplexity(Di, beta[i], log_perplexity, tol)
+        
+        # Fill in the row (except diagonal)
+        P[i, np.concatenate((np.r_[0:i], np.r_[i+1:n]))] = thisP
+    
+    # Symmetrize P and normalize
+    P = (P + P.T) / (2 * n)
+    
+    # Ensure diagonal is zero and avoid numerical issues
+    np.fill_diagonal(P, 0)
+    
+    # Normalize again to ensure sum is 1
+    P = P / np.sum(P)
+    
     return P
+
+def binary_search_perplexity(D, beta, log_perplexity, tol=1e-5, max_iter=50):
+    """Helper function for binary search to find proper beta values"""
+    def Hbeta(D, beta):
+        P = np.exp(-D * beta)
+        sumP = np.sum(P)
+        H = np.log(sumP) + beta * np.sum(D * P) / sumP
+        P = P / sumP
+        return H, P
+    
+    # Initialize search parameters
+    betamin = -np.inf
+    betamax = np.inf
+    H, P = Hbeta(D, beta)
+    Hdiff = H - log_perplexity
+    tries = 0
+    
+    while np.abs(Hdiff) > tol and tries < max_iter:
+        if Hdiff > 0:
+            betamin = beta.copy()
+            if betamax == np.inf:
+                beta *= 2
+            else:
+                beta = (beta + betamax) / 2
+        else:
+            betamax = beta.copy()
+            if betamin == -np.inf:
+                beta /= 2
+            else:
+                beta = (beta + betamin) / 2
+        
+        H, P = Hbeta(D, beta)
+        Hdiff = H - log_perplexity
+        tries += 1
+    
+    return H, P
