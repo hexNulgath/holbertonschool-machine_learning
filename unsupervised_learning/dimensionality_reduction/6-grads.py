@@ -19,19 +19,19 @@ def grads(Y, P):
     n, d = Y.shape
     Q, num = Q_affinities(Y)
     dY = np.zeros_like(Y)
-    
+
     # Compute squared Euclidean distances efficiently
     dists = compute_low_dim_distances(Y)
-    
+
     # Compute all pairwise differences (n, n, d)
     diff = Y[:, np.newaxis, :] - Y[np.newaxis, :, :]
-    
+
     # Compute coefficients (n, n)
     coeff = (P - Q) * (1 / (1 + dists))
-    
+
     # Vectorized gradient calculation
     dY = np.sum(coeff[:, :, np.newaxis] * diff, axis=1)
-    
+
     return dY, Q
 
 
