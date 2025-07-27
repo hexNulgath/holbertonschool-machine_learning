@@ -8,21 +8,35 @@ Q_affinities = __import__('5-Q_affinities').Q_affinities
 
 def grads(Y, P):
     """
-    calculates the gradients of Y
+    Calculates the gradients of Y
+    Args:
+        Y: Low-dimensional embeddings (n_samples, n_components)
+        P: High-dimensional affinities (n_samples, n_samples)
+    Returns:
+        dY: Gradient of KL divergence w.r.t. Y
+        Q: Low-dimensional affinities
     """
-    n , d = Y.shape
+    n, d = Y.shape
     Q, num = Q_affinities(Y)
     dY = np.zeros_like(Y)
-    diff = Y[:, None] - Y  # Pairwise differences
-    for i in range(n):
-        coeff = (P[i] - Q[i]) * (1 / (1 + compute_low_dim_distances(Y)[i]))
-        dY[i] = 4 * np.sum(diff[i] * coeff[:, None], axis=0)
-
+    
+    # Compute squared Euclidean distances efficiently
+    dists = compute_low_dim_distances(Y)
+    
+    # Compute all pairwise differences (n, n, d)
+    diff = Y[:, np.newaxis, :] - Y[np.newaxis, :, :]
+    
+    # Compute coefficients (n, n)
+    coeff = (P - Q) * (1 / (1 + dists))
+    
+    # Vectorized gradient calculation
+    dY = np.sum(coeff[:, :, np.newaxis] * diff, axis=1)
+    
     return dY, Q
 
 
 def compute_low_dim_distances(Y):
     """Squared Euclidean distances between all pairs in Y."""
     sum_Y = np.sum(Y**2, axis=1)
-    dists = np.add(np.add(-2 * np.dot(Y, Y.T), sum_Y).T + sum_Y, 0)
+    dists = np.add(np.add(-2 * np.dot(Y, Y.T), sum_Y).T, sum_Y)
     return np.maximum(dists, 0)
