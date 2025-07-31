@@ -15,22 +15,30 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
         return None, None
     if iterations < 1:
         return None, None
+
     results = []
     d_vars = []
-    max = True
+
+    # If kmax is not specified, test until variance stops decreasing
     if kmax is None:
-        kmax = X.shape[0]
-        max = False
+        kmax = X.shape[0]  # Maximum possible clusters is number of data points
+        find_optimal = True
+    else:
+        find_optimal = False
+
     for k in range(kmin, kmax + 1):
         C, clss = kmeans(X, k, iterations)
         if C is None or clss is None:
             return None, None
         results.append((C, clss))
         current_var = variance(X, C)
-        if max == False and d_vars:
-            if d_vars[-1] < current_var:
-                d_vars.append(current_var)
-                break
         d_vars.append(current_var)
+
+        # Check for convergence if we're finding optimal k automatically
+        if find_optimal and k > kmin:
+            # Stop if variance reduction is negligible (less than 1%)
+            prev_var = d_vars[-2]
+            if (prev_var - current_var) / prev_var < 0.01:
+                break
 
     return results, d_vars
