@@ -10,13 +10,13 @@ def expectation(X, pi, m, S):
     in the EM algorithm for a GMM
     """
     if not isinstance(X, np.ndarray) or len(X.shape) != 2:
-        return None
+        return (None, None)
     if not isinstance(pi, np.ndarray) or pi.ndim != 1:
-        return None
+        return (None, None)
     if not isinstance(m, np.ndarray) or m.ndim != 2:
-        return None
+        return (None, None)
     if not isinstance(S, np.ndarray) or S.ndim != 3:
-        return None
+        return (None, None)
     n, d = X.shape
     k = pi.shape[0]
 
