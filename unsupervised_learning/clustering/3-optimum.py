@@ -19,7 +19,7 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
     d_vars = []
     max = True
     if kmax is None:
-        kmax = np.Infinity
+        kmax = X.shape[0]
         max = False
     for k in range(kmin, kmax + 1):
         C, clss = kmeans(X, k, iterations)
