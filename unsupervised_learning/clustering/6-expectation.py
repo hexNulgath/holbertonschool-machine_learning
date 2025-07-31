@@ -20,10 +20,10 @@ def expectation(X, pi, m, S):
     n, d = X.shape
     k = pi.shape[0]
 
-    pdf_k = np.zeros((k,n))
+    pdf_k = np.zeros((k, n))
     for i in range(k):
         pdf_k[i] = pi[i] * pdf(X, m[i], S[i])
-    
+
     # Compute the log-likelihood (sum over all data points)
     li = np.sum(np.log(np.sum(pdf_k, axis=0)))
     # Compute responsibilities (normalize by the sum over all Gaussians)
