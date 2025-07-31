@@ -35,7 +35,7 @@ def kmeans(X, k, iterations=1000):
         return None, None
     clss = np.zeros(X.shape[0])
     for i in range(iterations):
-        distances = np.sqrt(((X[:, np.newaxis] - C)**2).sum(axis=2))
+        distances = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
         new_clss = np.argmin(distances, axis=1)
         for j in range(k):
             if np.any(new_clss == j):
