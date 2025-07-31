@@ -19,7 +19,9 @@ def expectation(X, pi, m, S):
         return (None, None)
     n, d = X.shape
     k = pi.shape[0]
-
+    if (k != S.shape[0] or d != m.shape[1] or d != S.shape[1]
+            or d != S.shape[2]):
+        return (None, None)
     pdf_k = np.zeros((k, n))
     for i in range(k):
         pdf_k[i] = pi[i] * pdf(X, m[i], S[i])
