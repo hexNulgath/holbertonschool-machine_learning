@@ -15,6 +15,8 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
         return None, None
     if iterations < 1:
         return None, None
+    if kmax is None:
+        kmax = kmin + 1
     results = []
     d_vars = []
     for i in range(kmin, kmax + 1):
