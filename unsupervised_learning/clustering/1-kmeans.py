@@ -41,7 +41,7 @@ def kmeans(X, k, iterations=1000):
         # Assign clusters
         distances = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
         new_clss = np.argmin(distances, axis=1)
-
+        old_C = C.copy()
         # Update centroids
         for j in range(k):
             mask = (new_clss == j)
@@ -52,9 +52,8 @@ def kmeans(X, k, iterations=1000):
                 C[j] = np.random.uniform(
                     low=min_vals, high=max_vals, size=X.shape[1])
 
-        # Check convergence
-        if np.array_equal(new_clss, clss):
-            break
+        if np.all(C == old_C):
+            return C, clss
         clss = new_clss
 
     return C, clss
