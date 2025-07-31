@@ -39,8 +39,9 @@ def kmeans(X, k, iterations=1000):
         clss = np.argmin(distances, axis=1)
         new_C = C.copy()
         for j in range(k):
-            if np.any(clss == j):
-                new_C[j] = X[clss == j].mean(axis=0)
+            cluster_points = X[clss == j]
+            if cluster_points.size > 0:
+                new_C[j] = cluster_points.mean(axis=0)
             else:
                 new_C[j] = initialize(X, 1)
         if np.allclose(C, new_C):
