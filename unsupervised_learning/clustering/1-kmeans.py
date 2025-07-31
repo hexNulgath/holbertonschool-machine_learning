@@ -38,8 +38,14 @@ def kmeans(X, k, iterations=1000):
     clss = np.zeros(X.shape[0], dtype=int)
 
     for _ in range(iterations):
-        # Assign clusters
-        distances = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
+        # Calculate distances from centroids
+        # Vectorized distance calculation instead of broadcasting
+        X_vectors = np.repeat(X[:, np.newaxis], k, axis=1)
+        X_vectors = np.reshape(X_vectors, (X.shape[0], k, X.shape[1]))
+        C_vectors = np.tile(C[np.newaxis, :], (X.shape[0], 1, 1))
+        C_vectors = np.reshape(C_vectors, (X.shape[0], k, X.shape[1]))
+        # Calculate Euclidean distances
+        distances = np.linalg.norm(X_vectors - C_vectors, axis=2)
         new_clss = np.argmin(distances, axis=1)
         old_C = C.copy()
         # Update centroids
