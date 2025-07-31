@@ -60,9 +60,8 @@ def kmeans(X, k, iterations=1000):
 
         if np.all(C == old_C):
             return C, clss
-        C_vectors = np.tile(C, (X.shape[0], 1))
-        C_vectors = C_vectors.reshape(X.shape[0], k, X.shape[1])
-        distance = np.linalg.norm(X_vectors - C_vectors, axis=2)
-        clss = np.argmin(distance ** 2, axis=1)
+        distances = np.linalg.norm(C - X[:, np.newaxis], axis=2)
+
+        clss = np.argmin(distances ** 2, axis=1)
 
     return C, clss
