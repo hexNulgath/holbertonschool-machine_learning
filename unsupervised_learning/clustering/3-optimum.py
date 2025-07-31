@@ -28,7 +28,7 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
         results.append((C, clss))
         current_var = variance(X, C)
         if max == False and d_vars:
-            if d_vars[-1] > current_var:
+            if d_vars[-1] < current_var:
                 d_vars.append(current_var)
                 break
         d_vars.append(current_var)
