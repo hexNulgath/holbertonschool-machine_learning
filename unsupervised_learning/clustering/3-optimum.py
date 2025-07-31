@@ -9,36 +9,38 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
     """
     tests for the optimum number of clusters by variance
     """
-    if kmin < 1 or (kmax is not None and kmax < kmin):
-        return None, None
     if not isinstance(X, np.ndarray) or len(X.shape) != 2:
         return None, None
-    if iterations < 1:
+    if not isinstance(kmin, int) or kmin < 1:
+        return None, None
+    if kmax is not None and (not isinstance(kmax, int) or kmax < kmin):
+        return None, None
+    if not isinstance(iterations, int) or iterations < 1:
         return None, None
 
-    results = []
-    d_vars = []
-
-    # If kmax is not specified, test until variance stops decreasing
+    # Ensure we analyze at least 2 different cluster sizes
     if kmax is None:
-        kmax = X.shape[0]  # Maximum possible clusters is number of data points
-        find_optimal = True
-    else:
-        find_optimal = False
+        kmax = kmin + 1  # At least test kmin and kmin+1
+    elif kmax == kmin:
+        kmax = kmin + 1  # Ensure at least 2 cluster sizes
 
+    results = []
+    variances = []
+
+    # Test each cluster size
     for k in range(kmin, kmax + 1):
         C, clss = kmeans(X, k, iterations)
         if C is None or clss is None:
             return None, None
         results.append((C, clss))
-        current_var = variance(X, C)
-        d_vars.append(current_var)
+        var = variance(X, C)
+        variances.append(var)
 
-        # Check for convergence if we're finding optimal k automatically
-        if find_optimal and k > kmin:
-            # Stop if variance reduction is negligible (less than 1%)
-            prev_var = d_vars[-2]
-            if (prev_var - current_var) / prev_var < 0.01:
-                break
+    # Calculate differences from smallest cluster size variance
+    if not variances:
+        return None, None
+
+    base_variance = variances[0]
+    d_vars = [base_variance - var for var in variances]
 
     return results, d_vars
