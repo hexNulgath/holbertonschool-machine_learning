@@ -22,17 +22,28 @@ def kmeans(X, k, iterations=1000):
     """
     performs K-means on a dataset
     """
+    if not isinstance(X, np.ndarray) or len(X.shape) != 2:
+        return None, None
+    if not isinstance(k, int) or k <= 0 or k > X.shape[0]:
+        return None, None
+    if not isinstance(iterations, int) or iterations <= 0:
+        return None, None
+
+    # Initialize centroids
     C = initialize(X, k)
+    if C is None:
+        return None, None
     clss = np.zeros(X.shape[0])
     for i in range(iterations):
-        clss = np.argmin(np.linalg.norm(X[:, np.newaxis] - C, axis=2), axis=1)
-        C_old = C.copy()
+        distances = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
+        new_clss = np.argmin(distances, axis=1)
         for j in range(k):
-            if np.any(clss == j):
-                C[j] = X[clss == j].mean(axis=0)
+            if np.any(new_clss == j):
+                C[j] = X[new_clss == j].mean(axis=0)
             else:
                 C[j] = initialize(X, 1)
-        if np.all(C_old == C):
-            return C, clss
+        if np.array_equal(new_clss, clss):
+            break
+        clss = new_clss
 
     return C, clss
