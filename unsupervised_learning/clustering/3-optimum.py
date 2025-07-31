@@ -20,9 +20,7 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
 
     # Ensure we analyze at least 2 different cluster sizes
     if kmax is None:
-        kmax = kmin + 1  # At least test kmin and kmin+1
-    elif kmax == kmin:
-        kmax = kmin + 1  # Ensure at least 2 cluster sizes
+        kmax = 12
 
     results = []
     variances = []
