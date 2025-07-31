@@ -20,10 +20,7 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
 
     # Determine the maximum k to test
     if kmax is None:
-        kmax = min(X.shape[0], 10)
-        find_optimal = True
-    else:
-        find_optimal = False
+        kmax = min(X.shape[0], 12)
 
     # Test each k in range
     for k in range(kmin, kmax + 1):
@@ -33,12 +30,5 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
         results.append((C, clss))
         current_var = variance(X, C)
         d_vars.append(current_var)
-
-        # Early stopping if we're searching for optimal k
-        if find_optimal and k > kmin:
-            # Stop if variance reduction is negligible (less than 5%)
-            prev_var = d_vars[-2]
-            if (prev_var - current_var) / prev_var < 0.05:
-                break
 
     return results, d_vars
