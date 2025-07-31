@@ -35,18 +35,16 @@ def kmeans(X, k, iterations=1000):
         return None, None
     clss = np.zeros(X.shape[0])
     for i in range(iterations):
-        diff = X[:, np.newaxis] - C
-        distances = np.sqrt(np.einsum('ijk,ijk->ij', diff, diff))
-        new_clss = np.argmin(distances, axis=1)
-        for j in range(k):
-            if np.any(new_clss == j):
-                C[j] = X[new_clss == j].mean(axis=0)
-            else:
-                C[j] = initialize(X, 1)
-        if np.array_equal(new_clss, clss):
-            break
-        diff = X[:, np.newaxis] - C
-        distances = np.sqrt(np.einsum('ijk,ijk->ij', diff, diff))
+        distances = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
         clss = np.argmin(distances, axis=1)
+        new_C = C.copy()
+        for j in range(k):
+            if np.any(clss == j):
+                new_C[j] = X[clss == j].mean(axis=0)
+            else:
+                new_C[j] = initialize(X, 1)
+        if np.allclose(C, new_C):
+            break
+        C = new_C
 
     return C, clss
