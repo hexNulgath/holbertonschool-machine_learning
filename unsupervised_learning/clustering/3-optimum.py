@@ -26,6 +26,6 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
         current_var = variance(X, C)
         total_vars.append(current_var)
     for var in total_vars:
-        d_vars.append(var - total_vars[0])
+        d_vars.append(np.sqrt((var - total_vars[0])**2))
 
-    return results, total_vars
+    return results, d_vars
