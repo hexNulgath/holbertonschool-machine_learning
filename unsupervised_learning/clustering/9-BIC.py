@@ -38,10 +38,10 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
         # Number of free parameters
         p = (i * d) + (i * d * (d + 1) // 2) + (i - 1)
         current_BIC = p * np.log(n) - 2 * li
-        
+
         L[idx] = li
         b[idx] = current_BIC
-        
+
         if current_BIC < best_BIC:
             best_k = i
             best_result = (pi, m, S)
