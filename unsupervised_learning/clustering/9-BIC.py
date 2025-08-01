@@ -36,7 +36,7 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
             X, i, iterations, tol, verbose)
 
         # Number of free parameters
-        p = i * (d + d * (d + 1) / 2)
+        p = (i * d) + (i * d * (d + 1) // 2) + (i - 1)
         current_BIC = p * np.log(n) - 2 * li
         
         L[idx] = li
