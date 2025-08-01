@@ -42,7 +42,7 @@ def expectation_maximization(X, k, iterations=1000, tol=1e-5, verbose=False):
         g, li = expectation(X, pi, m, S)
         if g is None or li is None:
             return None, None, None, None, None
-        if verbose and i % 10 == 0:
+        if verbose and (i % 10 == 0 or i == iterations):
             print(f"Log Likelihood after {i} iterations: {li:.5f}")
         if i > 0 and prev_l is not None and abs(li - prev_l) < tol:
             if verbose:
