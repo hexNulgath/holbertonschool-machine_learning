@@ -28,7 +28,7 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
     b = np.zeros(k_range)
     best_k = None
     best_result = None
-    best_BIC = np.inf  # Initialize to infinity for minimization
+    best_BIC = np.inf
 
     for i in range(kmin, kmax + 1):
         idx = i - kmin
