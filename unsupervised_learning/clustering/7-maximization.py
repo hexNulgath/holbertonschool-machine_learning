@@ -13,6 +13,8 @@ def maximization(X, g):
 
     if not isinstance(g, np.ndarray) or len(g.shape) != 2:
         return None, None, None
+    if g.shape[0] != X.shape[0]:
+        return None, None, None
 
     n, d = X.shape
     k = g.shape[0]
