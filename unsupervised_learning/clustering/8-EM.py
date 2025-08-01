@@ -43,10 +43,10 @@ def expectation_maximization(X, k, iterations=1000, tol=1e-5, verbose=False):
         if g is None or li is None:
             return None, None, None, None, None
         if verbose and (i % 10 == 0 or i == iterations):
-            print(f"Log Likelihood after {i} iterations: {li:.5g}")
+            print(f"Log Likelihood after {i} iterations: {format_number(li)}")
         if i > 0 and prev_l is not None and abs(li - prev_l) < tol:
             if verbose:
-                print(f"Log Likelihood after {i} iterations: {li:.5g}")
+                print(f"Log Likelihood after {i} iterations: {format_number(li)}")
             return pi, m, S, g, li
 
         prev_l = li
@@ -57,3 +57,12 @@ def expectation_maximization(X, k, iterations=1000, tol=1e-5, verbose=False):
                 return None, None, None, None, None
 
     return pi, m, S, g, li
+
+
+def format_number(value):
+    """Format number with 5 decimal places, removing trailing zeros"""
+    formatted = f"{value:.5f}"
+    if '.' in formatted:
+        # Remove trailing zeros and possible decimal point if no decimals left
+        formatted = formatted.rstrip('0').rstrip('.') if formatted.endswith('0') else formatted
+    return formatted
