@@ -14,7 +14,8 @@ def regular(P):
         return None
     if not np.all(np.isclose(P.sum(axis=1), 1)):
         return None
-    
+
+    n = P.shape[0]
     eigenvalues, eigenvectors = np.linalg.eig(P.T)
     steady_state_index = np.argmax(np.isclose(
         eigenvalues, 1))
@@ -24,4 +25,4 @@ def regular(P):
     if not np.all(pi > 0):
         return None
 
-    return pi.flatten()
+    return pi.reshape(1, n)
