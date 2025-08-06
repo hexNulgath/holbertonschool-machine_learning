@@ -16,11 +16,12 @@ def regular(P):
         return None
     
     eigenvalues, eigenvectors = np.linalg.eig(P.T)
-    steady_state_index = np.argmax(np.isclose(eigenvalues, 1))
+    steady_state_index = np.argmax(np.isclose(
+        eigenvalues, 1))
     pi = eigenvectors[:, steady_state_index].real
     pi /= pi.sum()
 
     if not np.all(pi > 0):
         return None
 
-    return pi
+    return pi.flatten()
