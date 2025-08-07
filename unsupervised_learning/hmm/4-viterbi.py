@@ -43,4 +43,5 @@ def viterbi(Observation, Emission, Transition, Initial):
     for t in range(T - 2, -1, -1):
         path_index = path[path_index, t + 1]
         best_path[t] = path_index
+    best_path = best_path.tolist()
     return best_path, P
