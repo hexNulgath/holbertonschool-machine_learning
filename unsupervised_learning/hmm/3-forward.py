@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""3-forward.py"""
 import numpy as np
 
 
