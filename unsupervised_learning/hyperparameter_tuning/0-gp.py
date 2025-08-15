@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""gp"""
 import numpy as np
+"""gp"""
 
 
 class GaussianProcess:
@@ -29,7 +29,6 @@ class GaussianProcess:
         """
         calculates the covariance kernel matrix between two matrices
         """
-        X1 = X1.flatten()
-        X2 = X2.flatten()
-        rbf = np.exp(-0.5 * (np.subtract.outer(X1, X2) ** 2) / self.l ** 2)
-        return self.sigma_f ** 2 * rbf
+        sqdist = np.sum(
+            X1**2, 1).reshape(-1, 1) + np.sum(X2**2, 1) - 2 * np.dot(X1, X2.T)
+        return self.sigma_f**2 * np.exp(-0.5 / self.l**2 * sqdist)
