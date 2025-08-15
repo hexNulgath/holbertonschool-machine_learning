@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import numpy as np
-"""0-gp.py"""
+"""
+0-gp.py
+represents a noiseless 1D Gaussian process
+"""
 
 
 class GaussianProcess:
