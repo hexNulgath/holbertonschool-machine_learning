@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import numpy as np
-"""gp"""
+"""0-gp.py"""
 
 
 class GaussianProcess:
