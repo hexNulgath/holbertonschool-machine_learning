@@ -67,19 +67,35 @@ class BayesianOptimization:
         sampled = []
         X_opt = None
         Y_opt = None
+        best_history = []
+
         for i in range(iterations):
+            # Get next point to sample
             X_next, _ = self.acquisition()
-            if X_next in sampled:
+
+            # Check if we've converged (optional)
+            if len(sampled) > 0 and np.min(
+                    np.abs(np.array(sampled) - X_next)) < 1e-6:
                 break
-            sampled.append(X_next)
+
+            # Evaluate the black-box function
             Y_next = self.f(X_next)
+            sampled.append(X_next)
             self.gp.update(X_next, Y_next)
+
+            # Update optimal point
             if self.minimize:
-                if Y_opt is None or Y_next < Y_opt:
+                improved = Y_opt is None or Y_next < Y_opt
+                if improved:
                     Y_opt = Y_next
                     X_opt = X_next
             else:
-                if Y_opt is None or Y_next > Y_opt:
+                improved = Y_opt is None or Y_next > Y_opt
+                if improved:
                     Y_opt = Y_next
                     X_opt = X_next
+
+            # Track history for convergence
+            best_history.append(Y_opt)
+
         return X_opt, Y_opt
