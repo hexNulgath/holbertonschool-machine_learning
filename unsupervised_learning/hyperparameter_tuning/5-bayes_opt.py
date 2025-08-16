@@ -32,10 +32,6 @@ class BayesianOptimization:
         self.X_s = np.linspace(bounds[0], bounds[1], ac_samples).reshape(-1, 1)
         self.xsi = xsi
         self.minimize = minimize
-        if minimize:
-            self.best = np.min(Y_init)
-        else:
-            self.best = np.max(Y_init)
 
     def acquisition(self):
         """
@@ -44,10 +40,14 @@ class BayesianOptimization:
         from scipy.stats import norm
 
         mu, sigma = self.gp.predict(self.X_s)
+        sigma = sigma.flatten()
+        sigma = np.maximum(sigma, 1e-9)
 
         if self.minimize:
+            self.best = np.min(self.gp.Y)
             improvement = self.best - mu - self.xsi
         else:
+            self.best = np.max(self.gp.Y)
             improvement = mu - self.best - self.xsi
 
         # Calculate Expected Improvement
@@ -64,38 +64,24 @@ class BayesianOptimization:
         """
         optimizes the black-box function
         """
-        sampled = []
-        X_opt = None
-        Y_opt = None
-        best_history = []
-
-        for i in range(iterations):
+        for _ in range(iterations):
             # Get next point to sample
             X_next, _ = self.acquisition()
 
-            # Check if we've converged (optional)
-            if len(sampled) > 0 and np.min(
-                    np.abs(np.array(sampled) - X_next)) < 1e-6:
+            # Check if this point has already been sampled
+            if X_next in self.gp.X:
                 break
 
             # Evaluate the black-box function
             Y_next = self.f(X_next)
-            sampled.append(X_next)
             self.gp.update(X_next, Y_next)
 
             # Update optimal point
             if self.minimize:
-                improved = Y_opt is None or Y_next < Y_opt
-                if improved:
-                    Y_opt = Y_next
-                    X_opt = X_next
+                idx = np.argmin(self.gp.Y)
             else:
-                improved = Y_opt is None or Y_next > Y_opt
-                if improved:
-                    Y_opt = Y_next
-                    X_opt = X_next
-
-            # Track history for convergence
-            best_history.append(Y_opt)
+                idx = np.argmax(self.gp.Y)
+            X_opt = self.gp.X[idx]
+            Y_opt = self.gp.Y[idx]
 
         return X_opt, Y_opt
