@@ -21,11 +21,9 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
     decoder_output = keras.layers.Dense(input_dims, activation='sigmoid')(x)
     decoder = keras.Model(inputs=input_layer_decoder, outputs=decoder_output)
 
-    auto_output = decoder(bottleneck)
+    auto_output = decoder(encoder(input_layer))
     auto = keras.Model(inputs=input_layer, outputs=auto_output)
 
-    encoder.compile(optimizer='adam', loss='binary_crossentropy')
-    decoder.compile(optimizer='adam', loss='binary_crossentropy')
     auto.compile(optimizer='adam', loss='binary_crossentropy')
 
     return encoder, decoder, auto
