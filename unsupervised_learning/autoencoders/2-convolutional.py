@@ -24,15 +24,7 @@ def autoencoder(input_dims, filters, latent_dims):
             padding='same'
         )(x)
 
-    # Final convolution to match latent_dims
-    encoded_output = keras.layers.Conv2D(
-        filters=latent_dims[-1],
-        kernel_size=(3, 3),
-        activation='relu',
-        padding='same'
-    )(x)
-
-    encoder = keras.Model(inputs=input_encoder, outputs=encoded_output)
+    encoder = keras.Model(inputs=input_encoder, outputs=x)
 
     # Decoder
     input_decoder = keras.Input(shape=latent_dims)
