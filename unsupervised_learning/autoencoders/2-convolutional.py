@@ -10,7 +10,7 @@ def autoencoder(input_dims, filters, latent_dims):
     # Encoder
     input_encoder = keras.Input(shape=input_dims)
     x = input_encoder
-    
+
     # Build encoder convolutional layers
     for filter_size in filters:
         x = keras.layers.Conv2D(
@@ -23,7 +23,7 @@ def autoencoder(input_dims, filters, latent_dims):
             pool_size=(2, 2),
             padding='same'
         )(x)
-    
+
     # Final convolution to match latent_dims
     encoded_output = keras.layers.Conv2D(
         filters=latent_dims[-1],
@@ -31,17 +31,17 @@ def autoencoder(input_dims, filters, latent_dims):
         activation='relu',
         padding='same'
     )(x)
-    
+
     encoder = keras.Model(inputs=input_encoder, outputs=encoded_output)
 
     # Decoder
     input_decoder = keras.Input(shape=latent_dims)
     x = input_decoder
-    
+
     # Build decoder convolutional layers (reverse order of filters)
     reversed_filters = filters[::-1]
-    same_pad = reversed_filters[:-1]
-    
+    same_pad = reversed_filters[:-2]
+
     for i, filter_size in enumerate(same_pad):
         x = keras.layers.Conv2D(
             filters=filter_size,
@@ -50,10 +50,10 @@ def autoencoder(input_dims, filters, latent_dims):
             padding='same'
         )(x)
         x = keras.layers.UpSampling2D((2, 2))(x)
-    
+
     # Last two filters
     x = keras.layers.Conv2D(
-        filters=reversed_filters[-1],
+        filters=reversed_filters[-2],
         kernel_size=(3, 3),
         activation='relu',
         padding='valid'
