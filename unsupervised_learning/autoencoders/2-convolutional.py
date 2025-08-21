@@ -40,7 +40,7 @@ def autoencoder(input_dims, filters, latent_dims):
 
     # Build decoder convolutional layers (reverse order of filters)
     reversed_filters = filters[::-1]
-    same_pad = reversed_filters[:-2]
+    same_pad = reversed_filters[:-1]
 
     for i, filter_size in enumerate(same_pad):
         x = keras.layers.Conv2D(
@@ -53,7 +53,7 @@ def autoencoder(input_dims, filters, latent_dims):
 
     # Last two filters
     x = keras.layers.Conv2D(
-        filters=reversed_filters[-2],
+        filters=reversed_filters[-1],
         kernel_size=(3, 3),
         activation='relu',
         padding='valid'
