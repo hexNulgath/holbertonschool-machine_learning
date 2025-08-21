@@ -45,7 +45,7 @@ def build_model(dropout_rate=0.5):
 
 def Train(
         epochs=50, batch_size=64, beta_1=0.9,
-        beta_2=0.999, dropout_rate=0.5, lr=0.001
+        beta_2=0.999, dropout_rate=0.5, learning_rate=0.001
         ):
     """Function to load data, preprocess, and build the model"""
 
@@ -60,13 +60,14 @@ def Train(
     model = build_model(dropout_rate=dropout_rate)
 
     model.compile(
-        optimizer=K.optimizers.Adam(lr=lr, beta_1=beta_1, beta_2=beta_2),
+        optimizer=K.optimizers.Adam(
+            learning_rate=learning_rate, beta_1=beta_1, beta_2=beta_2),
         loss='categorical_crossentropy',
         metrics=['accuracy']
     )
 
-    file_name = f"epochs={epochs}/batch={batch_size}/B1={beta_1}\
-        /B2={beta_2}/Dropout={dropout_rate}/lr={lr}"
+    file_name = f"epochs={epochs}-batch={batch_size}-B1={beta_1}\
+        -B2={beta_2}-Dropout={dropout_rate}-learning_rate={learning_rate}.weights.h5"
 
     callbacks = [
         K.callbacks.EarlyStopping(
@@ -99,7 +100,7 @@ def bayesian_optimization():
     """Function to perform Bayesian Optimization on the model"""
 
     bounds = [
-        {'name': 'lr', 'type': 'continuous', 'domain': (1e-5, 1e-2)},
+        {'name': 'learning_rate', 'type': 'continuous', 'domain': (1e-5, 1e-2)},
         {'name': 'batch_size', 'type': 'discrete', 'domain': (32, 64, 128)},
         {'name': 'epochs', 'type': 'discrete', 'domain': (10, 20, 30)},
         {'name': 'beta_1', 'type': 'continuous', 'domain': (0.9, 0.999)},
@@ -108,7 +109,7 @@ def bayesian_optimization():
     ]
 
     def objective_function(params):
-        lr = params[0][0]
+        learning_rate = params[0][0]
         batch_size = int(params[0][1])
         epochs = int(params[0][2])
         beta_1 = params[0][3]
@@ -121,7 +122,7 @@ def bayesian_optimization():
             beta_1=beta_1,
             beta_2=beta_2,
             dropout_rate=dropout_rate,
-            lr=lr
+            learning_rate=learning_rate
         )
 
         return -history.history['val_accuracy'][-1]
