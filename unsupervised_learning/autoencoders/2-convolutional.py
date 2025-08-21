@@ -12,7 +12,7 @@ def autoencoder(input_dims, filters, latent_dims):
     x = input_encoder
 
     # Build encoder convolutional layers
-    for filter_size in filters:
+    for filter_size in filters[:-1]:
         x = keras.layers.Conv2D(
             filters=filter_size,
             kernel_size=(3, 3),
