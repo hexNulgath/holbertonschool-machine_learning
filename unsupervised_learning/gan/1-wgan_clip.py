@@ -2,50 +2,105 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import matplotlib.pyplot as plt
+"""
+WGAN_clip module
+----------------
+Implements a Wasserstein GAN (WGAN) with weight
+clipping using TensorFlow/Keras.
 
-class WGAN_clip(keras.Model) :
-    
-    def __init__( self, generator , discriminator , latent_generator, real_examples, batch_size=200, disc_iter=2, learning_rate=.005):
-        super().__init__()                         # run the __init__ of keras.Model first. 
+Classes:
+    WGAN_clip: Subclass of keras.Model implementing
+    WGAN training with weight clipping.
+"""
+
+
+class WGAN_clip(keras.Model):
+    """
+    Wasserstein GAN with weight clipping.
+
+    Args:
+        generator: Keras model, the generator network.
+        discriminator: Keras model, the discriminator (critic) network.
+        latent_generator: Callable, generates latent vectors for the generator.
+        real_examples: Tensor, dataset of real samples.
+        batch_size: int, batch size for training.
+        disc_iter: int, number of discriminator updates per generator update.
+        learning_rate: float, learning rate for optimizers.
+    """
+    def __init__(self, generator, discriminator, latent_generator,
+                 real_examples, batch_size=200, disc_iter=2,
+                 learning_rate=.005):
+        """
+        Initialize the WGAN_clip model and set up optimizers
+        and loss functions.
+        """
+        super().__init__()  # run the __init__ of keras.Model first.
         self.latent_generator = latent_generator
-        self.real_examples    = real_examples
-        self.generator        = generator
-        self.discriminator    = discriminator
-        self.batch_size       = batch_size
-        self.disc_iter        = disc_iter
-        
-        self.learning_rate    = learning_rate
-        self.beta_1=.5                               # standard value, but can be changed if necessary
-        self.beta_2=.9                               # standard value, but can be changed if necessary
-        
-        # define the generator loss and optimizer (WGAN: generator loss is -mean(fake_output)):
-        self.generator.loss      = lambda x : -WGAN_clip.wasserstein_loss(tf.ones_like(x), x)
-        self.generator.optimizer = keras.optimizers.Adam(learning_rate=self.learning_rate, beta_1=self.beta_1, beta_2=self.beta_2)
-        # No need to compile since we use a custom training loop
+        self.real_examples = real_examples
+        self.generator = generator
+        self.discriminator = discriminator
+        self.batch_size = batch_size
+        self.disc_iter = disc_iter
 
-        # define the discriminator loss and optimizer (WGAN: mean(fake_output) - mean(real_output)):
-        self.discriminator.loss      = lambda x, y: WGAN_clip.wasserstein_loss(tf.ones_like(y), y) + WGAN_clip.wasserstein_loss(-tf.ones_like(x), x)
-        self.discriminator.optimizer = keras.optimizers.Adam(learning_rate=self.learning_rate, beta_1=self.beta_1, beta_2=self.beta_2)
-        # No need to compile since we use a custom training loop
-       
-    
+        self.learning_rate = learning_rate
+        self.beta_1 = .5  # standard value, but can be changed if necessary
+        self.beta_2 = .9  # standard value, but can be changed if necessary
+
+        self.generator.loss = lambda x: -WGAN_clip.wasserstein_loss(
+            tf.ones_like(x), x)
+        self.generator.optimizer = keras.optimizers.Adam(
+            learning_rate=self.learning_rate, beta_1=self.beta_1,
+            beta_2=self.beta_2)
+
+        self.discriminator.loss = lambda x, y: WGAN_clip.wasserstein_loss(
+            tf.ones_like(y), y) + WGAN_clip.wasserstein_loss(
+                -tf.ones_like(x), x)
+        self.discriminator.optimizer = keras.optimizers.Adam(
+            learning_rate=self.learning_rate,
+            beta_1=self.beta_1, beta_2=self.beta_2)
+
     # generator of real samples of size batch_size
     def get_fake_sample(self, size=None, training=False):
-        if not size :
-            size= self.batch_size
+        """
+        Generate a batch of fake samples using the generator.
+
+        Args:
+            size: int, number of samples to generate. Defaults to batch_size.
+            training: bool, whether to run in training mode.
+        Returns:
+            Tensor of generated samples.
+        """
+        if not size:
+            size = self.batch_size
         return self.generator(self.latent_generator(size), training=training)
 
     # generator of fake samples of size batch_size
     def get_real_sample(self, size=None):
-        if not size :
-            size= self.batch_size
+        """
+        Sample a batch of real examples from the dataset.
+
+        Args:
+            size: int, number of samples to draw. Defaults to batch_size.
+        Returns:
+            Tensor of real samples.
+        """
+        if not size:
+            size = self.batch_size
         sorted_indices = tf.range(tf.shape(self.real_examples)[0])
-        random_indices  = tf.random.shuffle(sorted_indices)[:size]
+        random_indices = tf.random.shuffle(sorted_indices)[:size]
         return tf.gather(self.real_examples, random_indices)
-        
-             
-    # overloading train_step()    
+
+    # overloading train_step()
     def train_step(self, useless_argument):
+        """
+        Custom training step for WGAN.
+        Performs multiple discriminator updates and one generator update.
+
+        Args:
+            useless_argument: Placeholder for compatibility with Keras API.
+        Returns:
+            Dictionary with discriminator and generator losses.
+        """
         # Train discriminator multiple times
         for _ in range(self.disc_iter):
             # Get real and fake samples
@@ -82,4 +137,13 @@ class WGAN_clip(keras.Model) :
 
     @staticmethod
     def wasserstein_loss(y_true, y_pred):
+        """
+        Wasserstein loss function.
+
+        Args:
+            y_true: Tensor, target labels (+1 or -1).
+            y_pred: Tensor, predicted values.
+        Returns:
+            Mean of y_true * y_pred.
+        """
         return tf.reduce_mean(y_true * y_pred)
