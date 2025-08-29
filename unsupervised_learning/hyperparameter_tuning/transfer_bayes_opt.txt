@@ -1,0 +1,14 @@
+Bayesian Optimization Report (Transfer Learning)
+==============================================
+
+Best hyperparameters:
+  - Initial Learning Rate: 0.000971
+  - Dense Units: 384
+  - Dropout Rate: 0.2577
+  - L2 Regularization: 0.002004
+  - Initial Epochs: 5
+  - Batch Size: 96
+  - Fine-tune Learning Rate: 0.000034
+  - Fine-tune Epochs: 5
+
+Best Validation Accuracy: 0.1000
