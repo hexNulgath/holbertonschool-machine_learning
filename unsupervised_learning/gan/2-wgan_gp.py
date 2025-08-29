@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """
 WGAN_GP module
