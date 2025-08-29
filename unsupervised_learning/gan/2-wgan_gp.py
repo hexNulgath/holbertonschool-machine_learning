@@ -141,45 +141,43 @@ class WGAN_GP(keras.Model):
             Dictionary with discriminator and generator losses, and gradient
             penalty.
         """
-        # Train discriminator (critic) multiple times
+        # training the discriminator
         for _ in range(self.disc_iter):
-            with tf.GradientTape() as d_tape:
-                # Get real and fake samples
+            with tf.GradientTape() as disc_tape:
                 real_samples = self.get_real_sample()
-                fake_samples = self.get_fake_sample(training=True)
+                fake_samples = self.get_fake_sample()
                 interpolated_samples = self.get_interpolated_sample(
-                                    real_samples, fake_samples)
-                # Discriminator outputs
+                    real_samples, fake_samples)
+
+                # compute the output of the discriminator
                 real_output = self.discriminator(real_samples, training=True)
                 fake_output = self.discriminator(fake_samples, training=True)
+
+                # compute the gradient penalty
                 gp = self.gradient_penalty(interpolated_samples)
 
-                # Wasserstein loss
-                d_loss = self.discriminator.loss(real_output, fake_output)
-
-                # Gradient penalty
+                # compute the loss of the discriminator
+                disc_loss = self.discriminator.loss(real_output,
+                                                    fake_output)
                 gp = self.gradient_penalty(interpolated_samples)
+                new_disc_loss = disc_loss + self.lambda_gp * gp
 
-                # Total discriminator loss
-                discr_loss = d_loss + self.lambda_gp * gp
-
-            # Apply gradients to discriminator
-            d_gradients = d_tape.gradient(
-                discr_loss,
-                self.discriminator.trainable_variables)
+            # update the discriminator weights
+            gradients_of_discriminator = disc_tape.gradient(
+                new_disc_loss, self.discriminator.trainable_variables)
             self.discriminator.optimizer.apply_gradients(
-                zip(d_gradients, self.discriminator.trainable_variables))
+                zip(gradients_of_discriminator,
+                    self.discriminator.trainable_variables))
 
-        # Train generator once
-        with tf.GradientTape() as g_tape:
-            fake_samples = self.get_fake_sample(training=True)
-            fake_output = self.discriminator(fake_samples, training=True)
-            g_loss = self.generator.loss(fake_output)
-
-        # Apply gradients to generator
-        g_gradients = g_tape.gradient(
-            g_loss, self.generator.trainable_variables)
+        # training the generator
+        with tf.GradientTape() as gen_tape:
+            fake_samples = self.get_fake_sample()
+            fake_output = self.discriminator(fake_samples, training=False)
+            gen_loss = self.generator.loss(fake_output)
+        # update the generator weights
+        gradients_of_generator = gen_tape.gradient(
+            gen_loss, self.generator.trainable_variables)
         self.generator.optimizer.apply_gradients(
-            zip(g_gradients, self.generator.trainable_variables))
+            zip(gradients_of_generator, self.generator.trainable_variables))
 
-        return {"discr_loss": discr_loss, "gen_loss": g_loss, "gp": gp}
+        return {"discr_loss": disc_loss, "gen_loss": gen_loss, "gp": gp}
