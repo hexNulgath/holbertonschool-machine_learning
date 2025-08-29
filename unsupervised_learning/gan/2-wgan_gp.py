@@ -53,20 +53,18 @@ class WGAN_GP(keras.Model):
             self.scal_shape[i] = 1
         self.scal_shape = tf.convert_to_tensor(self.scal_shape)
 
-        self.generator.loss = lambda x: -tf.reduce_mean(x)
+        self.generator.loss = lambda x: -self.wasserstein_loss(
+            tf.ones_like(x), x)
         self.generator.optimizer = keras.optimizers.Adam(
             learning_rate=self.learning_rate, beta_1=self.beta_1,
             beta_2=self.beta_2)
-        self.generator.compile(optimizer=self.generator.optimizer,
-                               loss=self.generator.loss)
 
-        self.discriminator.loss =  lambda x, y: (
-                tf.reduce_mean(y) - tf.reduce_mean(x))
+        self.discriminator.loss = lambda x, y: self.wasserstein_loss(
+            tf.ones_like(y), y) + self.wasserstein_loss(
+                -tf.ones_like(x), x)
         self.discriminator.optimizer = keras.optimizers.Adam(
             learning_rate=self.learning_rate,
             beta_1=self.beta_1, beta_2=self.beta_2)
-        self.discriminator.compile(optimizer=self.discriminator.optimizer,
-                                   loss=self.discriminator.loss)
 
     def get_fake_sample(self, size=None, training=False):
         """
@@ -171,7 +169,7 @@ class WGAN_GP(keras.Model):
         # Train generator once
         with tf.GradientTape() as g_tape:
             fake_samples = self.get_fake_sample(training=True)
-            fake_output = self.discriminator(fake_samples, training=False)
+            fake_output = self.discriminator(fake_samples, training=True)
             g_loss = self.generator.loss(fake_output)
 
         # Apply gradients to generator
@@ -181,3 +179,16 @@ class WGAN_GP(keras.Model):
             zip(g_gradients, self.generator.trainable_variables))
 
         return {"discr_loss": discr_loss, "gen_loss": g_loss, "gp": gp}
+
+    @staticmethod
+    def wasserstein_loss(y_true, y_pred):
+        """
+        Wasserstein loss function.
+
+        Args:
+            y_true: Tensor, target labels (+1 or -1).
+            y_pred: Tensor, predicted values.
+        Returns:
+            Mean of y_true * y_pred.
+        """
+        return tf.reduce_mean(y_true * y_pred)
