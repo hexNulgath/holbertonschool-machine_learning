@@ -145,9 +145,7 @@ class WGAN_GP(keras.Model):
                 # Get real and fake samples
                 real_samples = self.get_real_sample()
                 fake_samples = self.get_fake_sample(training=True)
-                interpolated_samples = self.get_interpolated_sample(
-                    real_samples, fake_samples)
-                
+
                 # Discriminator outputs
                 real_output = self.discriminator(real_samples, training=True)
                 fake_output = self.discriminator(fake_samples, training=True)
@@ -156,7 +154,8 @@ class WGAN_GP(keras.Model):
                 d_loss = self.discriminator.loss(real_output, fake_output)
 
                 # Gradient penalty
-
+                interpolated_samples = self.get_interpolated_sample(
+                    real_samples, fake_samples)
                 gp = self.gradient_penalty(interpolated_samples)
 
                 # Total discriminator loss
