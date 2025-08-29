@@ -62,12 +62,13 @@ class WGAN_GP(keras.Model):
         self.generator.compile(optimizer=self.generator.optimizer,
                                loss=self.generator.loss)
 
-        self.discriminator.loss = lambda x, y: (tf.reduce_mean(y) - tf.reduce_mean(x))
+        self.discriminator.loss = lambda x, y: (
+            tf.reduce_mean(y) - tf.reduce_mean(x))
         self.discriminator.optimizer = keras.optimizers.Adam(
             learning_rate=self.learning_rate,
             beta_1=self.beta_1, beta_2=self.beta_2)
         self.discriminator.compile(optimizer=self.discriminator.optimizer,
-                                    loss=self.discriminator.loss)
+                                   loss=self.discriminator.loss)
 
     def get_fake_sample(self, size=None, training=False):
         """
