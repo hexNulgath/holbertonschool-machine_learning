@@ -159,7 +159,6 @@ class WGAN_GP(keras.Model):
                 # compute the loss of the discriminator
                 disc_loss = self.discriminator.loss(real_output,
                                                     fake_output)
-                gp = self.gradient_penalty(interpolated_samples)
                 new_disc_loss = disc_loss + self.lambda_gp * gp
 
             # update the discriminator weights
