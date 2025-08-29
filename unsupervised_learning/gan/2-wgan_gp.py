@@ -151,7 +151,7 @@ class WGAN_GP(keras.Model):
                 fake_output = self.discriminator(fake_samples, training=True)
 
                 # Wasserstein loss
-                discr_loss = self.discriminator.loss(real_output, fake_output)
+                d_loss = self.discriminator.loss(real_output, fake_output)
 
                 # Gradient penalty
                 interpolated_samples = self.get_interpolated_sample(
@@ -159,11 +159,11 @@ class WGAN_GP(keras.Model):
                 gp = self.gradient_penalty(interpolated_samples)
 
                 # Total discriminator loss
-                new_discr_loss = discr_loss + self.lambda_gp * gp
+                discr_loss = d_loss + self.lambda_gp * gp
 
             # Apply gradients to discriminator
             d_gradients = d_tape.gradient(
-                new_discr_loss,
+                discr_loss,
                 self.discriminator.trainable_variables)
             self.discriminator.optimizer.apply_gradients(
                 zip(d_gradients, self.discriminator.trainable_variables))
@@ -180,7 +180,7 @@ class WGAN_GP(keras.Model):
         self.generator.optimizer.apply_gradients(
             zip(g_gradients, self.generator.trainable_variables))
 
-        return {"d_loss": new_discr_loss, "g_loss": g_loss, "gp": gp}
+        return {"discr_loss": discr_loss, "gen_loss": g_loss, "gp": gp}
 
     @staticmethod
     def wasserstein_loss(y_true, y_pred):
