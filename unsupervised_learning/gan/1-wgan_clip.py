@@ -19,12 +19,12 @@ class WGAN_clip(keras.Model) :
         self.beta_2=.9                               # standard value, but can be changed if necessary
         
         # define the generator loss and optimizer:
-        self.generator.loss      = lambda x : pass           # <----- new !
+        self.generator.loss      = lambda x : self.wasserstein_loss(tf.ones_like(x), x)
         self.generator.optimizer = keras.optimizers.Adam(learning_rate=self.learning_rate, beta_1=self.beta_1, beta_2=self.beta_2)
         self.generator.compile(optimizer=generator.optimizer , loss=generator.loss )
         
         # define the discriminator loss and optimizer:
-        self.discriminator.loss      = lambda x,y : pass   # <----- new !
+        self.discriminator.loss      = lambda x,y : self.wasserstein_loss(tf.ones_like(y), y) + self.wasserstein_loss(-tf.ones_like(x), x)
         self.discriminator.optimizer = keras.optimizers.Adam(learning_rate=self.learning_rate, beta_1=self.beta_1, beta_2=self.beta_2)
         self.discriminator.compile(optimizer=discriminator.optimizer , loss=discriminator.loss )
        
@@ -45,23 +45,41 @@ class WGAN_clip(keras.Model) :
         
              
     # overloading train_step()    
-    def train_step(self,useless_argument):
-        pass
-        #for _ in range(self.disc_iter) :
-            
-            # compute the loss for the discriminator in a tape watching the discriminator's weights
-                # get a real sample
-                # get a fake sample
-                # compute the loss discr_loss of the discriminator on real and fake samples
-            # apply gradient descent once to the discriminator
-            
-            # clip the weights (of the discriminator) between -1 and 1    # <----- new !
+    def train_step(self, useless_argument):
+        # Train discriminator multiple times
+        for _ in range(self.disc_iter):
+            # Get real and fake samples
+            real_samples = self.get_real_sample()
+            fake_samples = self.get_fake_sample(training=True)
 
-        # compute the loss for the generator in a tape watching the generator's weights 
-            # get a fake sample 
-            # compute the loss gen_loss of the generator on this sample
-        # apply gradient descent to the generator
-        
-        
-        
-        # return {"discr_loss": discr_loss, "gen_loss": gen_loss}
+            # Train discriminator
+            with tf.GradientTape() as tape:
+                real_output = self.discriminator(real_samples, training=True)
+                fake_output = self.discriminator(fake_samples, training=True)
+                discr_loss = self.discriminator.loss(real_output, fake_output)
+
+            # Calculate gradients and update discriminator
+            grads = tape.gradient(
+                discr_loss,
+                self.discriminator.trainable_variables)
+            self.discriminator.optimizer.apply_gradients(
+                zip(grads, self.discriminator.trainable_variables))
+            for var in self.discriminator.trainable_variables:
+                var.assign(tf.clip_by_value(var, -1, 1))
+
+        # Train generator
+        with tf.GradientTape() as tape:
+            fake_samples = self.get_fake_sample(training=True)
+            fake_output = self.discriminator(fake_samples, training=True)
+            gen_loss = self.generator.loss(fake_output)
+
+        # Calculate gradients and update generator
+        grads = tape.gradient(gen_loss, self.generator.trainable_variables)
+        self.generator.optimizer.apply_gradients(
+            zip(grads, self.generator.trainable_variables))
+
+        return {"discr_loss": discr_loss, "gen_loss": gen_loss}
+
+    @staticmethod
+    def wasserstein_loss(y_true, y_pred):
+        return tf.reduce_mean(y_true * y_pred)
