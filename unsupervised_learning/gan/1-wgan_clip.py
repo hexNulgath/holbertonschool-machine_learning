@@ -1,7 +1,3 @@
-import tensorflow as tf
-from tensorflow import keras
-import numpy as np
-import matplotlib.pyplot as plt
 """
 WGAN_clip module
 ----------------
@@ -12,6 +8,10 @@ Classes:
     WGAN_clip: Subclass of keras.Model implementing
     WGAN training with weight clipping.
 """
+import tensorflow as tf
+from tensorflow import keras
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 class WGAN_clip(keras.Model):
