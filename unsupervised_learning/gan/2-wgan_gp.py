@@ -1,4 +1,5 @@
 
+#!/usr/bin/env python3
 """
 WGAN_GP module
 --------------
@@ -139,30 +140,32 @@ class WGAN_GP(keras.Model):
             Dictionary with discriminator and generator losses, and gradient
             penalty.
         """
- # Train discriminator (critic) multiple times
+        # Train discriminator (critic) multiple times
         for _ in range(self.disc_iter):
             with tf.GradientTape() as d_tape:
                 # Get real and fake samples
                 real_samples = self.get_real_sample()
                 fake_samples = self.get_fake_sample(training=True)
-                
+
                 # Discriminator outputs
                 real_output = self.discriminator(real_samples, training=True)
                 fake_output = self.discriminator(fake_samples, training=True)
-                
+
                 # Wasserstein loss
                 discr_loss = self.discriminator.loss(real_output, fake_output)
-                
+
                 # Gradient penalty
-                interpolated_samples = self.get_interpolated_sample(real_samples, fake_samples)
+                interpolated_samples = self.get_interpolated_sample(
+                    real_samples, fake_samples)
                 gp = self.gradient_penalty(interpolated_samples)
-                
+
                 # Total discriminator loss
                 new_discr_loss = discr_loss + self.lambda_gp * gp
 
             # Apply gradients to discriminator
-            d_gradients = d_tape.gradient(new_discr_loss,
-                                          self.discriminator.trainable_variables)
+            d_gradients = d_tape.gradient(
+                new_discr_loss,
+                self.discriminator.trainable_variables)
             self.discriminator.optimizer.apply_gradients(
                 zip(d_gradients, self.discriminator.trainable_variables))
 
@@ -173,12 +176,12 @@ class WGAN_GP(keras.Model):
             g_loss = self.generator.loss(fake_output)
 
         # Apply gradients to generator
-        g_gradients = g_tape.gradient(g_loss, self.generator.trainable_variables)
+        g_gradients = g_tape.gradient(
+            g_loss, self.generator.trainable_variables)
         self.generator.optimizer.apply_gradients(
             zip(g_gradients, self.generator.trainable_variables))
 
         return {"d_loss": new_discr_loss, "g_loss": g_loss, "gp": gp}
-
 
     @staticmethod
     def wasserstein_loss(y_true, y_pred):
