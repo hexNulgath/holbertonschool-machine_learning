@@ -18,15 +18,15 @@ class WGAN_clip(keras.Model) :
         self.beta_1=.5                               # standard value, but can be changed if necessary
         self.beta_2=.9                               # standard value, but can be changed if necessary
         
-        # define the generator loss and optimizer:
-        self.generator.loss      = lambda x : self.wasserstein_loss(tf.ones_like(x), x)
+        # define the generator loss and optimizer (WGAN: generator loss is -mean(fake_output)):
+        self.generator.loss      = lambda x : -WGAN_clip.wasserstein_loss(tf.ones_like(x), x)
         self.generator.optimizer = keras.optimizers.Adam(learning_rate=self.learning_rate, beta_1=self.beta_1, beta_2=self.beta_2)
-        self.generator.compile(optimizer=generator.optimizer , loss=generator.loss )
-        
-        # define the discriminator loss and optimizer:
-        self.discriminator.loss      = lambda x,y : self.wasserstein_loss(tf.ones_like(y), y) + self.wasserstein_loss(-tf.ones_like(x), x)
+        # No need to compile since we use a custom training loop
+
+        # define the discriminator loss and optimizer (WGAN: mean(fake_output) - mean(real_output)):
+        self.discriminator.loss      = lambda x, y: WGAN_clip.wasserstein_loss(tf.ones_like(y), y) + WGAN_clip.wasserstein_loss(-tf.ones_like(x), x)
         self.discriminator.optimizer = keras.optimizers.Adam(learning_rate=self.learning_rate, beta_1=self.beta_1, beta_2=self.beta_2)
-        self.discriminator.compile(optimizer=discriminator.optimizer , loss=discriminator.loss )
+        # No need to compile since we use a custom training loop
        
     
     # generator of real samples of size batch_size
