@@ -56,17 +56,15 @@ class WGAN_GP(keras.Model):
         self.generator.loss = lambda x: -self.wasserstein_loss(
             tf.ones_like(x), x)
         self.generator.optimizer = keras.optimizers.Adam(
-            learning_rate=self.learning_rate,
-            beta_1=self.beta_1, beta_2=self.beta_2)
-        # No need to compile since we use a custom training loop
+            learning_rate=self.learning_rate, beta_1=self.beta_1,
+            beta_2=self.beta_2)
 
         self.discriminator.loss = lambda x, y: self.wasserstein_loss(
             tf.ones_like(y), y) + self.wasserstein_loss(
-                - tf.ones_like(x), x)
+                -tf.ones_like(x), x)
         self.discriminator.optimizer = keras.optimizers.Adam(
             learning_rate=self.learning_rate,
             beta_1=self.beta_1, beta_2=self.beta_2)
-        # No need to compile since we use a custom training loop
 
     def get_fake_sample(self, size=None, training=False):
         """
