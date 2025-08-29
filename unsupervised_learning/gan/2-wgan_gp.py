@@ -151,6 +151,7 @@ class WGAN_GP(keras.Model):
                 # Discriminator outputs
                 real_output = self.discriminator(real_samples, training=True)
                 fake_output = self.discriminator(fake_samples, training=True)
+                gp = self.gradient_penalty(interpolated_samples)
 
                 # Wasserstein loss
                 d_loss = self.discriminator.loss(real_output, fake_output)
