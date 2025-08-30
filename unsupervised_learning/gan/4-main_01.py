@@ -56,7 +56,7 @@ def plot_400(G) :
     for i in range(400) :
         axes[i//20,i%20].imshow(recover(H[i,:,:]))
         axes[i//20,i%20].axis("off")
-    plt.show()
+    plt.savefig("fake_faces.png")
 
 ## LET'S GO
 
