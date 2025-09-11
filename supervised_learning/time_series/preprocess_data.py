@@ -134,12 +134,6 @@ def preprocess_data(csv_1, window_size=60, k_ahead=1):
     # Flatten the sequences
     dataset = dataset.flat_map(lambda features, labels: 
         tf.data.Dataset.from_tensor_slices((features, labels)))
-    
-    # save as TFRecord for efficiency
-    tfrecord_file = "preprocessed_data.tfrecord"
-    tf.data.Dataset.save(dataset, tfrecord_file)
-    # Load from TFRecord to ensure it's working
-    dataset = tf.data.Dataset.load(tfrecord_file)
 
     return dataset
 
