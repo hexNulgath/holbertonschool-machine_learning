@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+creates a bag of words embedding matrix
+"""
 import string
 import numpy as np
 
