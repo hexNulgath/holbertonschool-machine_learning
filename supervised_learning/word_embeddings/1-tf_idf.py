@@ -3,103 +3,53 @@
 creates a TF-IDF embedding matrix
 """
 import numpy as np
-import string
 
 
 def tf_idf(sentences, vocab=None):
     """
     creates a TF-IDF embedding matrix
+
+    Contract
+    - Inputs:
+      - sentences: list of strings
+      - vocab: list of words to use as features (optional). If None, it will
+        be inferred using the same preprocessing as bag_of_words.
+    - Outputs:
+      - embeddings: numpy.ndarray of shape (n_sentences, n_features)
+      - features: numpy.ndarray of shape (n_features,) with the vocabulary in
+        the same order used to build embeddings.
+
+    Notes
+    - Term Frequency (TF) uses raw counts (no per-sentence normalization).
+    - Inverse Document Frequency (IDF) uses ln(N / df) without smoothing.
+    - Preprocessing and vocabulary building are aligned with bag_of_words.
     """
-    s_words = {'is', 'was', 'has', 'this', 'his', 'hers', 'its', 'us'}
-    punctuation = set(string.punctuation)
+    # Reuse bag_of_words to ensure identical preprocessing/tokenization
+    # Import locally to avoid circular import issues at module load time and
+    # to support unconventional filenames (e.g., "0-bag_of_words.py").
+    bag_of_words = __import__('0-bag_of_words').bag_of_words
 
-    # Create vocabulary if not provided
-    if vocab is None:
-        vocab = set()
+    # Get raw term counts and the actual features used
+    counts, features = bag_of_words(sentences, vocab)
 
-        # First pass: collect all words as they appear
-        for sentence in sentences:
-            for word in sentence.split():
-                word = word.lower()
-                word = ''.join(
-                    char for char in word if char not in punctuation)
-                vocab.add(word)
+    n_docs = counts.shape[0]
+    # Document frequency: number of sentences where term appears at least once
+    df = (counts > 0).sum(axis=0)
 
-        # Convert to list for processing
-        vocab_list = list(vocab)
+    # Smooth IDF (scikit-learn style): 1 + ln((1 + N) / (1 + df))
+    idf = 1.0 + np.log((1.0 + n_docs) / (1.0 + df))
 
-        # Second pass: remove plurals only if singular exists
-        final_vocab = set()
-        for word in vocab_list:
-            # Check if word ends with 's' and might be a plural
-            if (word.endswith('s') and
-                len(word) > 1 and  # Don't process single letter words
-                not word.endswith('ss') and  # Words like 'class', 'glass'
-                not word.endswith('us') and  # Words like 'bus', 'plus'
-                    word not in s_words):  # Common exceptions
+    # Apply TF-IDF: broadcast idf over rows
+    tf_idf_matrix = counts * idf
 
-                singular = word[:-1]
-                # Only remove plural if singular form exists in vocabulary
-                if singular in vocab_list:
-                    final_vocab.add(singular)
-                else:
-                    final_vocab.add(word)
-            else:
-                final_vocab.add(word)
+    # L2 normalize rows
+    norms = np.linalg.norm(tf_idf_matrix, axis=1, keepdims=True)
+    # Avoid division by zero: leave all-zero rows as zero
+    tf_idf_matrix = np.divide(
+        tf_idf_matrix,
+        norms,
+        out=np.zeros_like(tf_idf_matrix, dtype=float),
+        where=norms != 0,
+    )
 
-        vocab = sorted(final_vocab)
-
-    # Helper function to process words consistently
-    def process_word(word):
-        word = word.lower()
-        word = ''.join(char for char in word if char not in punctuation)
-
-        # Apply the same plural removal logic as during vocabulary creation
-        if (word.endswith('s') and
-            len(word) > 1 and
-            not word.endswith('ss') and
-            not word.endswith('us') and
-                word not in s_words):
-
-            singular = word[:-1]
-            if singular in vocab:
-                return singular
-        return word
-
-    # Initialize matrices
-    tf = np.zeros((len(sentences), len(vocab)))
-    idf = np.zeros((1, len(vocab)))
-
-    # Calculate TF (Term Frequency)
-    for i, sentence in enumerate(sentences):
-        words = sentence.split()
-        word_count = 0
-
-        for word in words:
-            processed_word = process_word(word)
-            if processed_word in vocab:
-                j = vocab.index(processed_word)
-                tf[i][j] += 1
-                word_count += 1
-
-        # Normalize TF by the number of valid words in the sentence
-        if word_count > 0:
-            tf[i] /= word_count
-
-    # Calculate IDF (Inverse Document Frequency)
-    for j, word in enumerate(vocab):
-        count = 0
-        for sentence in sentences:
-            sentence_words = [process_word(w) for w in sentence.split()]
-            if word in sentence_words:
-                count += 1
-
-        if count > 0:
-            idf[0][j] = np.log(len(sentences) / count)
-        else:
-            idf[0][j] = 0
-
-    # Calculate TF-IDF
-    tf_idf_matrix = tf * idf
-
-    return tf_idf_matrix, np.array(vocab)
+    return tf_idf_matrix, features
