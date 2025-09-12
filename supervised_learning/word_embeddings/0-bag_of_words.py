@@ -7,10 +7,10 @@ def bag_of_words(sentences, vocab=None):
     """
     creates a bag of words embedding matrix
     """
+    s_words = {'is', 'was', 'has', 'this', 'his', 'hers', 'its', 'us'}
+    punctuation = set(string.punctuation)
     # Create vocabulary if not provided
     if vocab is None:
-        s_words = {'is', 'was', 'has', 'this', 'his', 'hers', 'its', 'us'}
-        punctuation = set(string.punctuation)
         vocab = set()
 
         # First pass: collect all words as they appear
