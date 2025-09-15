@@ -14,6 +14,5 @@ def cumulative_bleu(references, sentence, n):
     for i in range(1, n + 1):
         bleu = ngram_bleu(references, sentence, i)
         bleu_scores.append(bleu)
-        print(f"BLEU-{i}: {bleu}")
 
     return np.prod(bleu_scores) ** (1 / n)
