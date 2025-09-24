@@ -21,13 +21,13 @@ class RNNEncoder(tf.keras.layers.Layer):
                                        return_sequences=True,
                                        return_state=True,
                                        recurrent_initializer='glorot_uniform')
-    
+
     def initialize_hidden_state(self):
         """
         Initializes the hidden states for the RNN
         """
         return tf.zeros((self.batch, self.units))
-    
+
     def call(self, x, initial):
         """
         Call method for the encoder
