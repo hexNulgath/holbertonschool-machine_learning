@@ -4,7 +4,6 @@ Module that contains the class SelfAttention
 """
 import tensorflow as tf
 
-
 class SelfAttention(tf.keras.layers.Layer):
     """
     calculate the attention for machine translation
