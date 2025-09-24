@@ -4,6 +4,7 @@ Module that contains the class SelfAttention
 """
 import tensorflow as tf
 
+
 class SelfAttention(tf.keras.layers.Layer):
     """
     calculate the attention for machine translation
@@ -25,7 +26,7 @@ class SelfAttention(tf.keras.layers.Layer):
         s_prev_expanded = tf.expand_dims(s_prev, 1)
 
         score = self.V(tf.nn.tanh(
-            self.W(hidden_states) + self.U(s_prev_expanded)))
+            self.W(s_prev_expanded) + self.U(hidden_states)))
         attention_weights = tf.nn.softmax(score, axis=1)
         context_vector = tf.reduce_sum(
             attention_weights * hidden_states, axis=1)
