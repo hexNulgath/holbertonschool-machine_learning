@@ -16,5 +16,4 @@ def positional_encoding(max_seq_len, dm):
     PE[:, 0::2] = np.sin(position * div_term)
     # add cos to odd indices in the array
     PE[:, 1::2] = np.cos(position * div_term)
-    positional_encoding = PE[np.newaxis, ...]
-    return positional_encoding
+    return PE
