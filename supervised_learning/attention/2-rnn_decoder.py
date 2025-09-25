@@ -18,12 +18,23 @@ class RNNDecoder(tf.keras.layers.Layer):
         self.batch = batch
         self.units = units
         self.attention = SelfAttention(units)
-        self.embedding = tf.keras.layers.Embedding(vocab, embedding)
-        self.gru = tf.keras.layers.GRU(units,
-                                       return_sequences=True,
-                                       return_state=True,
-                                       recurrent_initializer='glorot_uniform')
-        self.F = tf.keras.layers.Dense(vocab)
+        
+        # Use specific initializers
+        self.embedding = tf.keras.layers.Embedding(
+            vocab, embedding,
+            embeddings_initializer='glorot_uniform'
+        )
+        self.gru = tf.keras.layers.GRU(
+            units,
+            return_sequences=True,
+            return_state=True,
+            recurrent_initializer='glorot_uniform',
+            kernel_initializer='glorot_uniform'
+        )
+        self.F = tf.keras.layers.Dense(
+            vocab,
+            kernel_initializer='glorot_uniform'
+        )
 
     def call(self, x, s_prev, hidden_states):
         """
