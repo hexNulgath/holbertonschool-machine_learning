@@ -2,6 +2,10 @@
 """
 Module that contains the class RNNDecoder
 """
+import os
+os.environ['TF_GPU_THREAD_MODE'] = 'gpu_private'
+os.environ['TF_GPU_THREAD_COUNT'] = '1'
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 import tensorflow as tf
 SelfAttention = __import__('1-self_attention').SelfAttention
 
@@ -18,22 +22,18 @@ class RNNDecoder(tf.keras.layers.Layer):
         self.batch = batch
         self.units = units
         self.attention = SelfAttention(units)
-        
-        # Use specific initializers
+
         self.embedding = tf.keras.layers.Embedding(
             vocab, embedding,
-            embeddings_initializer='glorot_uniform'
-        )
+            embeddings_initializer='uniform')
         self.gru = tf.keras.layers.GRU(
             units,
             return_sequences=True,
             return_state=True,
-            recurrent_initializer='glorot_uniform',
-            kernel_initializer='glorot_uniform'
+            recurrent_initializer='glorot_uniform'
         )
         self.F = tf.keras.layers.Dense(
-            vocab,
-            kernel_initializer='glorot_uniform'
+            vocab
         )
 
     def call(self, x, s_prev, hidden_states):
@@ -44,7 +44,7 @@ class RNNDecoder(tf.keras.layers.Layer):
         context, _ = self.attention(s_prev, hidden_states)
         context = tf.expand_dims(context, axis=1)
         x = tf.concat([context, x], axis=-1)
-        y, s = self.gru(x)
+        y, s = self.gru(x, initial_state=s_prev)
         y = self.F(y)
         y = tf.squeeze(y, axis=1)
 
