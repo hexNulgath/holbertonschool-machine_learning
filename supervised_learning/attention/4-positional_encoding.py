@@ -9,11 +9,12 @@ def positional_encoding(max_seq_len, dm):
     """
     Function that calculates the positional encoding for a transformer
     """
-    positional_encoding = np.zeros((max_seq_len, dm))
-    for pos in range(max_seq_len):
-        for i in range(0, dm, 2):
-            positional_encoding[pos, i] = np.sin(pos / (10000 ** (i / dm)))
-            if i + 1 < dm:
-                positional_encoding[pos, i + 1] = np.cos(
-                    pos / (10000 ** ((i + 1) / dm)))
+    PE = np.zeros((max_seq_len, dm))
+    position = np.arange(0, max_seq_len).reshape(-1, 1)
+    div_term = np.exp(np.arange(0, dm, 2) * -(np.log(10000.0) / dm))
+    # add sin to even indices in the array
+    PE[:, 0::2] = np.sin(position * div_term)
+    # add cos to odd indices in the array
+    PE[:, 1::2] = np.cos(position * div_term)
+    positional_encoding = PE[np.newaxis, ...]
     return positional_encoding
