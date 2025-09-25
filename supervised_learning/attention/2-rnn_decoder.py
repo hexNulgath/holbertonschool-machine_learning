@@ -3,6 +3,7 @@
 Module that contains the class RNNDecoder
 """
 import tensorflow as tf
+SelfAttention = __import__('1-self_attention').SelfAttention
 
 
 class RNNDecoder(tf.keras.layers.Layer):
@@ -27,7 +28,6 @@ class RNNDecoder(tf.keras.layers.Layer):
         """
         Call method for the RNN Decoder
         """
-        SelfAttention = __import__('1-self_attention').SelfAttention
         x = self.embedding(x)
         context, _ = SelfAttention(self.units)(s_prev, hidden_states)
         x = tf.concat([tf.expand_dims(context, 1), x], axis=-1)
