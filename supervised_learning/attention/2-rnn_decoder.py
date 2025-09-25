@@ -2,10 +2,6 @@
 """
 Module that contains the class RNNDecoder
 """
-import os
-os.environ['TF_GPU_THREAD_MODE'] = 'gpu_private'
-os.environ['TF_GPU_THREAD_COUNT'] = '1'
-os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 import tensorflow as tf
 SelfAttention = __import__('1-self_attention').SelfAttention
 
