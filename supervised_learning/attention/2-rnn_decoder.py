@@ -15,7 +15,6 @@ class RNNDecoder(tf.keras.layers.Layer):
         Class constructor
         """
         super(RNNDecoder, self).__init__()
-        self.attention = SelfAttention(units)
         self.embedding = tf.keras.layers.Embedding(input_dim=vocab,
                                                    output_dim=embedding)
         self.gru = tf.keras.layers.GRU(units=units,
@@ -28,14 +27,11 @@ class RNNDecoder(tf.keras.layers.Layer):
         """
         Call method for the RNN Decoder
         """
+        units = s_prev.shape[1]
+        attention = SelfAttention(units)
+        context, _ = attention(s_prev, hidden_states)
         x = self.embedding(x)
-        context, _ = self.attention(s_prev, hidden_states)
-        context = tf.expand_dims(context, axis=1)
-        x = tf.concat([context, x], axis=-1)
-
-        y, s = self.gru(x, initial_state=s_prev)
-
-        y = self.F(y)
-        y = tf.squeeze(y, axis=1)
-
-        return y, s
+        concat = tf.concat([tf.expand_dims(context, 1), x], axis=-1)
+        outputs, s = self.gru(concat)
+        y = tf.reshape(outputs, (outputs.shape[0], outputs.shape[2]))
+        return self.F(y), s
