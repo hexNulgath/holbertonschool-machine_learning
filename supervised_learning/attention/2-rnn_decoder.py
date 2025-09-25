@@ -34,5 +34,6 @@ class RNNDecoder(tf.keras.layers.Layer):
         x = tf.concat([context, x], axis=-1)
         y, s = self.gru(x)
         y = self.F(y)
-        
+        y = tf.squeeze(y, axis=1)
+
         return y, s
