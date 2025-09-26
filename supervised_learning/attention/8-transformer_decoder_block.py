@@ -38,8 +38,8 @@ class DecoderBlock(tf.keras.layers.Layer):
         encoder_output - a tensor of shape (batch, input_seq_len, dm)
             containing the output of the encoder
         training - a boolean to determine if the model is training
-        look_ahead_mask - the mask to be applied to the first multi head attention
-        padding_mask - the mask to be applied to the second multi head attention
+        look_ahead_mask - the mask to be applied to the first multi head
+        padding_mask - the mask to be applied to the second multi head
         Returns: a tensor of shape (batch, target_seq_len, dm)
         containing the block’s output
         """
@@ -47,8 +47,8 @@ class DecoderBlock(tf.keras.layers.Layer):
         attn1 = self.dropout1(attn1, training=training)
         out1 = self.layernorm1(x + attn1)
 
-        attn2, _ = self.mha2(encoder_output, encoder_output,
-                             out1, padding_mask)
+        attn2, _ = self.mha2(out1, encoder_output,
+                             encoder_output, padding_mask)
         attn2 = self.dropout2(attn2, training=training)
         out2 = self.layernorm2(out1 + attn2)
 
