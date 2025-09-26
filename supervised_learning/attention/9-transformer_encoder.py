@@ -27,7 +27,7 @@ class Encoder(tf.keras.layers.Layer):
         ]
         self.dropout = tf.keras.layers.Dropout(drop_rate)
 
-    def call(self, x, training):
+    def call(self, x, training, mask):
         """
         x - a tensor of shape (batch, input_seq_len, dm)
             containing the input to the encoder
@@ -38,10 +38,11 @@ class Encoder(tf.keras.layers.Layer):
         """
         seq_len = tf.shape(x)[1]
         x = self.embedding(x)
-        x += self.positional_encoding[:seq_len, :]
+        x *= tf.math.sqrt(tf.cast(self.dm, tf.float32))
+        x += self.positional_encoding[:seq_len]
         x = self.dropout(x, training=training)
 
         for block in self.blocks:
-            x = block(x, training)
+            x = block(x, training=training, mask=mask)
 
         return x
