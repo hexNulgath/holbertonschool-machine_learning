@@ -25,7 +25,8 @@ class Transformer(tf.keras.Model):
                                target_vocab, max_seq_target, drop_rate)
         self.linear = tf.keras.layers.Dense(target_vocab)
 
-    def call(self, inputs, training):
+    def call(self, inputs, target, training, encoder_mask,
+             look_ahead_mask, decoder_mask):
         """
         inputs - a tensor of shape (batch, input_seq_len)
         containing the inputs
@@ -35,10 +36,12 @@ class Transformer(tf.keras.Model):
         encoder_mask - the padding mask to be applied to the encoder
         look_ahead_mask - the look ahead mask to be applied to the decoder
         decoder_mask - the padding mask to be applied to the decoder
-        Returns: a tensor of shape (batch, target_seq_len, target_vocab)
-        containing the transformer output
         """
-        encoder_output = self.encoder(inputs, training=training)
-        decoder_output = self.decoder(encoder_output, training=training)
+        encoder_output = self.encoder(
+            inputs, training=training, mask=encoder_mask)
+        decoder_output = self.decoder(
+            target, encoder_output, training=training,
+            look_ahead_mask=look_ahead_mask,
+            padding_mask=decoder_mask)
         output = self.linear(decoder_output)
         return output
