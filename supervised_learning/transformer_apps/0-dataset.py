@@ -2,9 +2,8 @@
 """
 creates a dataset
 """
-import tensorflow as tf
 import tensorflow_datasets as tfds
-from transformers import AutoTokenizer
+import transformers
 
 
 class Dataset:
@@ -31,9 +30,9 @@ class Dataset:
         for pt, en in data:
             pt_sentences.append(pt.numpy().decode('utf-8'))
             en_sentences.append(en.numpy().decode('utf-8'))
-        tokenizer_pt = AutoTokenizer.from_pretrained(
+        tokenizer_pt = transformers.AutoTokenizer.from_pretrained(
             'neuralmind/bert-base-portuguese-cased')
-        tokenizer_en = AutoTokenizer.from_pretrained(
+        tokenizer_en = transformers.AutoTokenizer.from_pretrained(
             'bert-base-uncased')
         tokenizer_pt.train_new_from_iterator(pt_sentences, 2**13)
         tokenizer_en.train_new_from_iterator(en_sentences, 2**13)
