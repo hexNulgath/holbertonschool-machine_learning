@@ -4,6 +4,7 @@ creates a dataset
 """
 import tensorflow_datasets as tfds
 import transformers
+import tensorflow as tf
 
 
 class Dataset:
@@ -12,14 +13,16 @@ class Dataset:
     """
     def __init__(self):
         """constructor"""
-        self.data_train = tfds.load(
+        train = tfds.load(
             'ted_hrlr_translate/pt_to_en', split='train',
             as_supervised=True)
-        self.data_valid = tfds.load(
+        validate = tfds.load(
             'ted_hrlr_translate/pt_to_en', split='validation',
             as_supervised=True)
         self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(
-            self.data_train)
+           train)
+        self.data_valid = validate.map(self.tf_encode)
+        self.data_train = train.map(self.tf_encode)
 
     def tokenize_dataset(self, data):
         """
@@ -56,5 +59,17 @@ class Dataset:
             en.numpy().decode('utf-8'), add_special_tokens=False)
         pt_tokens = [pt_size] + pt_tokens + [pt_size + 1]
         en_tokens = [en_size] + en_tokens + [en_size + 1]
+
+        return pt_tokens, en_tokens
+
+    def tf_encode(self, pt, en):
+        """
+        acts as a tensorflow wrapper for the encode instance method
+        """
+        pt_tokens, en_tokens = tf.py_function(
+            self.encode, [pt, en], [tf.int64, tf.int64])
+
+        pt_tokens.set_shape([None])
+        en_tokens.set_shape([None])
 
         return pt_tokens, en_tokens
