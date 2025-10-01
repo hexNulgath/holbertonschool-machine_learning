@@ -28,8 +28,8 @@ class Dataset:
         pt_sentences = []
         en_sentences = []
         for pt, en in data:
-            pt_sentences.append(pt.numpy().decode('utf-8'))
-            en_sentences.append(en.numpy().decode('utf-8'))
+            pt_sentences.append(pt)
+            en_sentences.append(en)
         tokenizer_pt = transformers.AutoTokenizer.from_pretrained(
             'neuralmind/bert-base-portuguese-cased')
         tokenizer_en = transformers.AutoTokenizer.from_pretrained(
