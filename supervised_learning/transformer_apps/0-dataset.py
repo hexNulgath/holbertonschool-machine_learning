@@ -31,9 +31,9 @@ class Dataset:
             pt_sentences.append(pt.numpy().decode('utf-8'))
             en_sentences.append(en.numpy().decode('utf-8'))
         tokenizer_pt = transformers.AutoTokenizer.from_pretrained(
-            'neuralmind/bert-base-portuguese-cased', use_fast=True)
+            'neuralmind/bert-base-portuguese-cased', clean_up_tokenization_spaces=True)
         tokenizer_en = transformers.AutoTokenizer.from_pretrained(
-            'bert-base-uncased', use_fast=True)
+            'bert-base-uncased', clean_up_tokenization_spaces=True)
         tokenizer_pt.train_new_from_iterator(pt_sentences, 2**13)
         tokenizer_en.train_new_from_iterator(en_sentences, 2**13)
 
