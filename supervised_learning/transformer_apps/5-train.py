@@ -63,15 +63,11 @@ def train_transformer(N, dm, h, hidden, max_len, batch_size, epochs):
                                           decoder_mask=dec_padding_mask)
                 token_losses = loss_object(tar_real, predictions)
 
-                mask = tf.cast(tf.not_equal(tar_real, 0), dtype=token_losses.dtype)
-                masked_losses = token_losses * mask
-                loss = tf.reduce_sum(masked_losses) / (tf.reduce_sum(mask) + 1e-9)
-
-            gradients = tape.gradient(loss, transformer.trainable_variables)
+            gradients = tape.gradient(token_losses, transformer.trainable_variables)
             optimizer.apply_gradients(zip(gradients, transformer.trainable_variables))
 
-            tr_loss.update_state(loss)
-            tr_accuracy.update_state(tar_real, predictions, sample_weight=mask)
+            tr_loss.update_state(token_losses)
+            tr_accuracy.update_state(tar_real, predictions)
 
             if batch % 50 == 0:
                 print(f'Epoch {epoch + 1}, Batch {batch}: '
