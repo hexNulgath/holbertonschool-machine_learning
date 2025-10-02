@@ -27,8 +27,8 @@ class Transformer(tf.keras.Model):
                                target_vocab, max_seq_target, drop_rate)
         self.linear = tf.keras.layers.Dense(target_vocab)
 
-    def call(self, inputs, target, training, encoder_mask,
-             look_ahead_mask, decoder_mask):
+    def call(self, inputs, target, training, encoder_mask=None,
+             look_ahead_mask=None, decoder_mask=None):
         """
         inputs - a tensor of shape (batch, input_seq_len)
         containing the inputs
