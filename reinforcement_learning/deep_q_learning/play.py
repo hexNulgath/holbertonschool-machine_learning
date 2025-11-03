@@ -24,6 +24,8 @@ os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 os.environ["TF_USE_CUDA_PLUGIN"] = "0"
 os.environ["XLA_FLAGS"] = "--xla_cpu_enable_fast_math=false"
 os.environ["TF_XLA_FLAGS"] = "--tf_xla_enable_xla_devices=false"
+os.environ["SDL_VIDEODRIVER"] = "x11"
+os.environ["SDL_RENDER_DRIVER"] = "software"
 
 
 # Hyperparameters
@@ -56,14 +58,85 @@ class Wrapper(gym.Wrapper):
         super().__init__(env)
 
     def reset(self, **kwargs):
+        # Return only observation for keras-rl compatibility
         observation, info = self.env.reset(**kwargs)
+
+        # Auto-FIRE to start the game to prevent waiting state
+        # triggering noop actions
+        try:
+            meanings = self.env.unwrapped.get_action_meanings()
+            if "FIRE" in meanings:
+                fire_action = meanings.index("FIRE")
+                for i in range(2):
+                    res = self.env.step(fire_action)
+                    if isinstance(res, tuple) and len(res) == 5:
+                        obs2, reward, terminated, truncated, info2 = res
+                        done = terminated or truncated
+                    else:
+                        obs2, reward, done, info2 = res
+                    if done:
+                        observation, info = self.env.reset(**kwargs)
+                        break
+        except Exception:
+            pass
+
+        # Initialize lives tracking
+        try:
+            self.last_lives = self._get_lives()
+        except Exception:
+            self.last_lives = None
 
         return observation
 
     def step(self, action):
-        obs, reward, terminated, truncated, info = self.env.step(action)
-        done = terminated or truncated
-        return obs, reward, done, info
+        result = self.env.step(action)
+        if isinstance(result, tuple) and len(result) == 5:
+            observation, reward, terminated, truncated, info = result
+            done = terminated or truncated
+        else:
+            observation, reward, done, info = result
+
+        # Auto-FIRE on life loss to prevent waiting state
+        try:
+            current_lives = self._get_lives()
+            if self.last_lives is not None and current_lives is not None and current_lives < self.last_lives:
+                try:
+                    meanings = self.env.unwrapped.get_action_meanings()
+                    if "FIRE" in meanings:
+                        fire_action = meanings.index("FIRE")
+                        for i in range(2):
+                            _res = self.env.step(fire_action)
+                            if isinstance(_res, tuple):
+                                if len(_res) == 5:
+                                    observation, reward2, terminated2, truncated2, info = _res
+                                    done = terminated2 or truncated2
+                                else:
+                                    observation, reward2, done, info = _res
+                            if done:
+                                break
+                except Exception:
+                    pass
+            self.last_lives = current_lives
+        except Exception:
+            pass
+
+        return observation, reward, done, info
+
+    def _get_lives(self):
+        # help function to get current number of lives for triggering auto-FIRE
+        try:
+            if hasattr(self.env.unwrapped, "ale") and hasattr(
+                 self.env.unwrapped.ale, "lives"):
+                return int(self.env.unwrapped.ale.lives())
+        except Exception:
+            pass
+        try:
+            if hasattr(self.env, "last_info") and isinstance(
+                 self.env.last_info, dict) and "lives" in self.env.last_info:
+                return int(self.env.last_info["lives"])
+        except Exception:
+            pass
+        return None
 
     def render(self, mode='human'):
         return self.env.render()
