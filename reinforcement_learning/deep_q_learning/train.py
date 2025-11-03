@@ -145,7 +145,7 @@ def main():
     print("Starting training.")
     agent.fit(env, nb_steps=nb_steps, visualize=visualize, verbose=1,
               callbacks=[SaveEveryNSteps(save_interval=save_interval)])
-    agent.save_weights("policyplay.h5", overwrite=True)
+    agent.save_weights("policy.h5", overwrite=True)
     print("Training complete — model saved.")
 
 
