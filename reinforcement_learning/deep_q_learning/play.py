@@ -73,7 +73,7 @@ def env_setup(render_mode="human"):
     # Create environment with human render mode for visualization
     env = gym.make("ALE/Breakout-v5", frameskip=1, render_mode=render_mode)
     env = AtariPreprocessing(env, screen_size=84, grayscale_obs=True,
-                             frame_skip=1, noop_max=30)
+                             frame_skip=4)
     env = Wrapper(env)
     return env
 
@@ -82,7 +82,7 @@ def create_q_model():
     # Define NN for training
     model = keras.Sequential([
         layers.InputLayer(input_shape=(4, 84, 84)),
-        layers.Reshape((84, 84, 4)),
+        layers.Permute((2, 3, 1)),
         layers.Conv2D(32, 8, strides=4, activation="relu"),
         layers.Conv2D(64, 4, strides=2, activation="relu"),
         layers.Conv2D(64, 3, strides=1, activation="relu"),
