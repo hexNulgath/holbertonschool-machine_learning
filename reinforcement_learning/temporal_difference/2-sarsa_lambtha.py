@@ -31,7 +31,7 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100, alpha=0.1,
 
         # Choose initial action
         if np.random.uniform() < epsilon:
-            action = np.random.randint(env.action_space.n)
+            action = np.random.randint(Q.shape[1])
         else:
             action = np.argmax(Q[state])
 
@@ -41,13 +41,13 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100, alpha=0.1,
 
             # Choose next action
             if np.random.uniform() < epsilon:
-                next_action = np.random.randint(env.action_space.n)
+                next_action = np.random.randint(Q.shape[1])
             else:
                 next_action = np.argmax(Q[next_state])
 
             # Calculate TD error
-            delta = reward + (
-                gamma * Q[next_state, next_action]) - Q[state, action]
+            delta = (reward + gamma *
+                     Q[next_state, next_action] - Q[state, action])
 
             # Update eligibility trace
             E[state, action] += 1
@@ -63,7 +63,7 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100, alpha=0.1,
                 break
 
         # Decay epsilon (multiplicative decay)
-        epsilon = max(
-            min_epsilon, initial_epsilon * np.exp(-epsilon_decay * ep))
+        epsilon = (min_epsilon + (initial_epsilon - min_epsilon) *
+                   np.exp(-epsilon_decay * ep))
 
     return Q
