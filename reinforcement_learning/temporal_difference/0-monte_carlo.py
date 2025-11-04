@@ -40,12 +40,12 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1,
     for ep in range(episodes):
         episode = instance(env, policy, max_steps)
         G = 0
-        visited_states = set()
+        episode = np.array(episode, dtype=int)
 
         # Work backwards through the episode (first-visit)
-        for state, reward in reversed(episode):
-            G = gamma * G + reward
-            if state not in visited_states:
-                visited_states.add(state)
+        for t in range(len(episode) - 1, -1, -1):
+            state, reward = episode[t]
+            G = reward + gamma * G
+            if state not in episode[:ep, 0]:
                 V[state] += alpha * (G - V[state])
     return V
