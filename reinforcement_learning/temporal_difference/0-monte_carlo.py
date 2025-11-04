@@ -1,35 +1,20 @@
 #!/usr/bin/env python3
 """Monte Carlo."""
 import numpy as np
-import gymnasium as gym
 
 
 def instance(env, policy, max_steps=100):
-    """
-    Generates an episode following the given policy.
-
-    Args:
-        env: The environment instance.
-        policy: A function that takes in a state and returns the
-            next action to take.
-        max_steps: The maximum number of steps per episode.
-
-    Returns:
-        episode: A list of (state, reward, action) tuples.
-        T: The last timestep index.
-    """
+    """Generate an episode following the given policy."""
     state, _ = env.reset()
     episode = []
 
-    for t in range(max_steps):
+    for _ in range(max_steps):
         action = policy(state)
-        next_state, reward, terminated, truncated, _ = env.step(action)
+        next_state, reward, ter, trunc, _ = env.step(action)
         episode.append((state, reward))
-
-        if terminated or truncated:
-            break
         state = next_state
-
+        if ter or trunc:
+            break
     return episode
 
 
