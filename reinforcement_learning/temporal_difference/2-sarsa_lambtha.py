@@ -23,31 +23,47 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100, alpha=0.1,
     Returns:
         Q: the updated Q table
     """
+    initial_epsilon = epsilon
+
     for ep in range(episodes):
         state, _ = env.reset()
         E = np.zeros(Q.shape)
 
+        # Choose initial action
         if np.random.rand() < epsilon:
             action = env.action_space.sample()
         else:
             action = np.argmax(Q[state])
 
         for step in range(max_steps):
-            next_state, reward, ter, trunc, _ = env.step(action)
+            # Take action, observe next state and reward
+            next_state, reward, terminated, truncated, _ = env.step(action)
+
+            # Choose next action
             if np.random.rand() < epsilon:
                 next_action = env.action_space.sample()
             else:
                 next_action = np.argmax(Q[next_state])
 
-            delta = reward + gamma * Q[next_state, next_action] - Q[state, action]
+            # Calculate TD error
+            delta = reward + (
+                gamma * Q[next_state, next_action]) - Q[state, action]
+
+            # Update eligibility trace
             E[state, action] += 1
 
+            # Update Q-values and eligibility traces
             Q += alpha * delta * E
             E *= gamma * lambtha
 
+            # Move to next state and action
             state, action = next_state, next_action
-            if ter or trunc:
+
+            if terminated or truncated:
                 break
-        epsilon = max(min_epsilon, epsilon * (1 - epsilon_decay))
+
+        # Decay epsilon (multiplicative decay)
+        epsilon = max(
+            min_epsilon, initial_epsilon * np.exp(-epsilon_decay * ep))
 
     return Q
