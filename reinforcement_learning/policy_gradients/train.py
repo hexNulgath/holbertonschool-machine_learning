@@ -4,7 +4,7 @@ import numpy as np
 policy_gradient = __import__('policy_gradient').policy_gradient
 
 
-def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
+def train(env, nb_episodes, alpha=0.000045, gamma=0.98, show_result=False):
     """
     implements a full training.
 
@@ -46,6 +46,8 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
 
         total_reward = sum(rewards)
         scores.append(total_reward)
-        print(f"Episode: {episode} Score: {total_reward:.1f}")
+        if show_result and (episode + 1) % 100 == 0:
+            env.render()
+            print(f"Episode: {episode + 1} Score: {total_reward:.1f}")
 
     return scores

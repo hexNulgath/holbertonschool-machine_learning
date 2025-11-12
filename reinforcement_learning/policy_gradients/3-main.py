@@ -11,11 +11,9 @@ def set_seed(env, seed=0):
     np.random.seed(seed)
     random.seed(seed)
 
-env = gym.make('CartPole-v1')
-set_seed(env, 1)
+env = gym.make('CartPole-v1', render_mode="human")
+set_seed(env, 0)
 
-scores = train(env, 20)
-print("Scores:", scores)
-plt.plot(np.arange(len(scores)), scores)
-plt.show()
+scores = train(env, 10000, 0.000045, 0.98, True)
+
 env.close()
