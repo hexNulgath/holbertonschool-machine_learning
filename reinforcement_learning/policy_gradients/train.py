@@ -20,31 +20,29 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
     for episode in range(nb_episodes):
         state, _ = env.reset()
         done = False
-        states, grads, rewards = [], [], []
+        returns, grads, rewards = [], [], []
 
         while not done:
             # Choose action and gradient
             action, grad = policy_gradient(state, weight)
+            grads.append(grad)
             # Step in environment
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
 
-            states.append(state)
-            grads.append(grad)
             rewards.append(reward)
 
             state = next_state
 
         # Compute discounted returns G_t for each time step
-        G = np.zeros_like(rewards, dtype=np.float64)
-        running_add = 0
-        for t in reversed(range(len(rewards))):
-            running_add = rewards[t] + gamma * running_add
-            G[t] = running_add
-
+        G = 0
+        for r in reversed(rewards):
+            G = r + gamma * G
+            returns.insert(0, G)
+    
         # Update weights using the full episode
-        for t in range(len(G)):
-            weight += alpha * grads[t] * G[t]
+        for t in range(len(grads)):
+            weight += alpha * returns[t] * grads[t]
 
         total_reward = sum(rewards)
         scores.append(total_reward)
