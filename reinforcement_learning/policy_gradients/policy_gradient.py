@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import numpy as np
 """policy gradient"""
+import numpy as np
 
 
 def policy(matrix, weight):
