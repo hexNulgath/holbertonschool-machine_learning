@@ -49,6 +49,5 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98, show_result=False):
         print(f"Episode: {episode} Score: {total_reward:.1f}")
         if show_result and (episode + 1) % 100 == 0:
             env.render()
-            
 
     return scores
