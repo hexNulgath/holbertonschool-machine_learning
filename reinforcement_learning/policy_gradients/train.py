@@ -42,9 +42,6 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
             running_add = rewards[t] + gamma * running_add
             G[t] = running_add
 
-        # Normalize returns
-        G = (G - np.mean(G)) / (np.std(G) + 1e-8)
-
         # Update weights using all episode data for MC
         for g, grad in zip(G, grads):
             weight += alpha * grad * g
