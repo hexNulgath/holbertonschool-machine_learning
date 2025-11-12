@@ -39,7 +39,7 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98, show_result=False):
         for r in reversed(rewards):
             G = r + gamma * G
             returns.insert(0, G)
-    
+
         # Update weights using the full episode
         for t in range(len(grads)):
             weight += alpha * returns[t] * grads[t]
