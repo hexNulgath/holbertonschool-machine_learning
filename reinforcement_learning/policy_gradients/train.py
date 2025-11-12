@@ -41,10 +41,12 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
         for t in reversed(range(len(rewards))):
             running_add = rewards[t] + gamma * running_add
             G[t] = running_add
+        if len(G) > 1:
+            G = (G - np.mean(G)) / (np.std(G) + 1e-8)
 
-        # Update weights using all episode data for MC
-        for g, grad in zip(G, grads):
-            weight += alpha * grad * g
+        # Update weights using the full episode
+        for t in range(len(G)):
+            weight += alpha * grads[t] * G[t]
 
         total_reward = sum(rewards)
         scores.append(total_reward)
