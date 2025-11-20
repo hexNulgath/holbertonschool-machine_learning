@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """3-first_launch.py"""
 import requests
+from datetime import datetime,timezone
 
 
 if __name__ == '__main__':
@@ -16,7 +17,8 @@ if __name__ == '__main__':
         f"https://api.spacexdata.com/v4/launchpads/{response['launchpad']}"
     )
     launchpad = requests.get(launchpad_url).json()
+    launch_time = response['date_local']
     print(
-        f"{response['name']} ({response['date_utc']}) {rocket['name']} - "
+        f"{response['name']} ({launch_time}) {rocket['name']} - "
         f"{launchpad['name']} ({launchpad['locality']})"
     )
