@@ -11,9 +11,12 @@ if __name__ == '__main__':
     if url:
         response = requests.get(url)
         if response.status_code == 403:
-            ti = int(response.headers.get('X-RateLimit-Reset', 0))
-            ti = datetime.fromtimestamp(ti).minute
-            print(f"Reset in {ti} min")
+            reset_timestamp = int(response.headers.get('X-RateLimit-Reset', 0))
+            now_timestamp = int(datetime.now().timestamp())
+
+            seconds_left = reset_timestamp - now_timestamp
+            minutes_left = int(seconds_left / 60)
+            print(f"Reset in {minutes_left} min")
         elif response.status_code == 404:
             print("Not found")
         else:
