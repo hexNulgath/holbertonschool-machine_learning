@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """3-first_launch.py"""
 import requests
-from datetime import datetime,timezone
 
 
 if __name__ == '__main__':
