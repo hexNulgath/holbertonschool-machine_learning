@@ -5,7 +5,9 @@ import requests
 
 if __name__ == '__main__':
     response = requests.get(
-        'https://api.spacexdata.com/v4/launches/next').json()
+        'https://api.spacexdata.com/v4/launches/upcoming').json()
+    launches = sorted(response, key=lambda x: x['date_utc'])
+    response = launches[0]
     rocket_url = (
         f"https://api.spacexdata.com/v4/rockets/{response['rocket']}"
     )
