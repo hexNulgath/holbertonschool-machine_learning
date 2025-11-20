@@ -4,7 +4,8 @@ import requests
 
 
 if __name__ == '__main__':
-    response = requests.get('https://api.spacexdata.com/v4/launches/next').json()
+    response = requests.get(
+        'https://api.spacexdata.com/v4/launches/next').json()
     rocket_url = (
         f"https://api.spacexdata.com/v4/rockets/{response['rocket']}"
     )
