@@ -8,7 +8,7 @@ DETERMINISTIC
 BEGIN
     RETURN CASE
         WHEN b = 0 THEN 0
-        ELSE ROUND(a / b, 6)
+        ELSE ROUND(a / b)
     END;
 END$$
 
