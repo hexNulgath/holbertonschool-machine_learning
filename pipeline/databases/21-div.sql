@@ -1,4 +1,3 @@
--- 21-div.sql
 DROP FUNCTION IF EXISTS SafeDiv;
 DELIMITER $$
 
@@ -6,11 +5,13 @@ CREATE FUNCTION SafeDiv(a INT, b INT)
 RETURNS DOUBLE
 DETERMINISTIC
 BEGIN
-    RETURN CASE
-        WHEN b = 0 THEN 0
-        ELSE a / b
-    END;
+    RETURN ROUND(
+        CASE
+            WHEN b = 0 THEN 0
+            ELSE a / b
+        END,
+        6
+    );
 END$$
 
 DELIMITER ;
-
