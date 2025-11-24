@@ -6,7 +6,7 @@ CREATE PROCEDURE ComputeAverageWeightedScoreForUser(IN p_user_id INT)
 BEGIN
     DECLARE v_weighted_sum DECIMAL(10,2);
     DECLARE v_total_weight DECIMAL(10,2);
-    DECLARE v_average DECIMAL(10,2);
+    DECLARE v_average DECIMAL(10,3);
 
     -- Calculate weighted sum and total weight
     SELECT 
