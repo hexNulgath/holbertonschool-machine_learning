@@ -4,25 +4,21 @@ DELIMITER $$
 
 CREATE PROCEDURE ComputeAverageWeightedScoreForUser(IN p_user_id INT)
 BEGIN
-    DECLARE total_weighted DECIMAL(30,6) DEFAULT 0;
-    DECLARE total_weight DECIMAL(30,6) DEFAULT 0;
-    DECLARE avg_score DECIMAL(10,4);
+    DECLARE v_total_score DECIMAL(10,2);
 
-    SELECT
-        COALESCE(SUM(s.score * s.weight), 0),
-        COALESCE(SUM(s.weight), 0)
-    INTO total_weighted, total_weight
-    FROM corrections s
-    WHERE s.user_id = p_user_id;
+    -- Calculate weighted score sum
+    SELECT SUM(c.score * p.weight)
+    INTO v_total_score
+    FROM corrections c
+    JOIN projects p ON c.project_id = p.id
+    WHERE c.user_id = p_user_id;
 
-    IF total_weight = 0 THEN
-        SET avg_score = 0;
-    ELSE
-        SET avg_score = total_weighted / total_weight;
-    END IF;
+    -- If null (no corrections), set to 0
+    SET v_total_score = IFNULL(v_total_score, 0);
 
+    -- Update the users table
     UPDATE users
-    SET average_score = avg_score
+    SET average_score = v_total_score
     WHERE id = p_user_id;
 END$$
 
