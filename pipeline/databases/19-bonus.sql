@@ -19,7 +19,7 @@ BEGIN
 
         SET proj_id = LAST_INSERT_ID();
     END IF;
-    INSERT INTO bonuses (user_id, project_id, score)
+    INSERT INTO corrections (user_id, project_id, score)
     VALUES (user_id, proj_id, score);
 END$$
 
