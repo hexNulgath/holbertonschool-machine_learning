@@ -6,13 +6,10 @@ CREATE FUNCTION SafeDiv(a INT, b INT)
 RETURNS DOUBLE
 DETERMINISTIC
 BEGIN
-    RETURN ROUND(
-        CASE
-            WHEN b = 0 THEN 0
-            ELSE a / b
-        END,
-        6
-    );
+    RETURN CASE
+        WHEN b = 0 THEN 0
+        ELSE ROUND(a / b, 6)
+    END;
 END$$
 
 DELIMITER ;
