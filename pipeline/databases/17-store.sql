@@ -1,13 +1,9 @@
 -- 17-store.sql
-DELIMITER $$
+DROP TRIGGER IF EXISTS store;
 
-CREATE TRIGGER decrease_quantity
+CREATE TRIGGER store
 AFTER INSERT ON orders
 FOR EACH ROW
-BEGIN
     UPDATE items
     SET quantity = quantity - orders.number
     WHERE name = orders.item_name;
-END$$
-
-DELIMITER ;
